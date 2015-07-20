@@ -124,8 +124,12 @@ namespace Cassiopeia
 
         static void Harass()
         {
+
+
             var useQhr = config["harass"]["useq"].GetValue<MenuBool>().Value;
             var useWhr = config["harass"]["usew"].GetValue<MenuBool>().Value;
+
+
 
             if (Orbwalker.ActiveMode == OrbwalkerMode.Hybrid)
             {
@@ -137,6 +141,11 @@ namespace Cassiopeia
 
                 && !target.IsInvulnerable))
                 {
+                    if (target.HasBuffOfType(BuffType.Poison))
+                    {
+                        E.CastOnUnit(target);
+                    }
+
                     //Q+E
                     if (E.IsInRange(target) && !useWhr)
                     {
