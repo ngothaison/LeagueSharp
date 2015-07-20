@@ -1,0 +1,243 @@
+﻿
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Drawing;
+using LeagueSharp;
+using LeagueSharp.SDK.Core;
+using LeagueSharp.SDK.Core.Wrappers;
+using LeagueSharp.SDK.Core.Enumerations;
+using LeagueSharp.SDK.Core.Extensions;
+using LeagueSharp.SDK.Core.UI.IMenu;
+using LeagueSharp.SDK.Core.UI.IMenu.Values;
+using SharpDX;
+using LeagueSharp.SDK.Core.Events;
+using LeagueSharp.SDK.Core.IDrawing;
+using Menu = LeagueSharp.SDK.Core.UI.IMenu.Menu;
+
+
+namespace Cassiopeia
+{
+    class Program
+    {
+        private static readonly Obj_AI_Hero Player = ObjectManager.Player;
+        private static Menu config;
+        private static Spell Q, W, E, R;
+        private const int AutoAttackRange = 550;
+
+        static void Main(string[] args)
+        {
+            Load.OnLoad += OnLoad;
+        }
+
+        static void OnLoad(object sender, EventArgs args)
+        {
+            if (Player.ChampionName != "Cassiopeia")
+                return;
+
+            Bootstrap.Init(null);
+            config = new Menu("cassiopeia", "Cassiopeia", true);
+
+            var drawmenu = config.Add(new Menu("drawing", "Drawing"));
+
+            drawmenu.Add(new MenuBool("drawQ", "Draw Q, W range"));
+
+            drawmenu.Add(new MenuBool("drawE", "Draw E range"));
+            drawmenu.Add(new MenuBool("drawR", "Draw R range"));
+
+            var farm = config.Add(new Menu("farm", "Farm"));
+            farm.Add(new MenuBool("useqlh", "Use Q Last Hit"));
+            farm.Add(new MenuBool("useelh", "Use E Last Hit"));
+
+            var combo = config.Add(new Menu("combo", "Combo Settings"));
+            combo.Add(new MenuBool("useQ", "Use Q"));
+            combo.Add(new MenuBool("useW", "Use W"));
+            combo.Add(new MenuBool("useR", "Use R"));
+
+            var harass = config.Add(new Menu("harass", "Harass Settings"));
+
+            harass.Add(new MenuBool("useq", "Use Q"));
+            harass.Add(new MenuBool("usew", "Use W"));
+
+
+
+
+
+            Q = new Spell(SpellSlot.Q, 850f);
+            W = new Spell(SpellSlot.W, 850f);
+            E = new Spell(SpellSlot.E, 700f);
+            R = new Spell(SpellSlot.R, 825f);
+
+            Q.SetSkillshot(false, SkillshotType.SkillshotCircle);
+            W.SetSkillshot(false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(false, SkillshotType.SkillshotCone);
+
+            config.Attach();
+            Drawing.OnDraw += OnDraw;
+            Game.OnUpdate += OnUpdate;
+        }
+
+        static void OnUpdate(EventArgs args)
+        {
+            switch (Orbwalker.ActiveMode)
+            {
+                case OrbwalkerMode.Orbwalk:
+                    Combo();
+                    break;
+                case OrbwalkerMode.LastHit:
+                    Lasthit();
+                    break;
+                case OrbwalkerMode.LaneClear:
+                    Laneclear();
+                    break;
+                case OrbwalkerMode.Hybrid:
+                    Harass();
+                    break;
+            }
+
+
+
+
+        }
+
+        private static double Qdmg(Obj_AI_Base target)
+        {
+            return
+              Player.CalculateDamage(target, DamageType.Magical,
+                    new[] { 75, 115, 155, 195, 235 }[Q.Level - 1] + 0.45 * Player.FlatMagicDamageMod);
+        }
+        private static double Wdmg(Obj_AI_Base target)
+        {
+            return
+              Player.CalculateDamage(target, DamageType.Magical,
+                    new[] { 90, 135, 180, 225, 270 }[W.Level - 1] + 0.9 * Player.FlatMagicDamageMod);
+        }
+
+        private static double Edmg(Obj_AI_Base target)
+        {
+            return
+              Player.CalculateDamage(target, DamageType.Magical,
+                    new[] { 55, 80, 105, 130, 155 }[E.Level - 1] + 0.55 * Player.FlatMagicDamageMod);
+        }
+
+        static void Harass()
+        {
+            var useQhr = config["harass"]["useq"].GetValue<MenuBool>().Value;
+            var useWhr = config["harass"]["usew"].GetValue<MenuBool>().Value;
+
+            if (Orbwalker.ActiveMode == OrbwalkerMode.Hybrid)
+            {
+                foreach (var target in ObjectManager.Get<Obj_AI_Hero>().Where(
+                target =>
+                Player.Distance(target.ServerPosition) <= E.Range
+                && target.IsEnemy
+                && target.IsValidTarget()
+
+                && !target.IsInvulnerable))
+                {
+                    //Q+E
+                    if (E.IsInRange(target) && !useWhr)
+                    {
+                        if (Q.IsReady() && useQhr)
+                            Q.Cast(target);
+                        if (E.IsReady())
+                            E.CastOnUnit(target);
+                    }
+
+                    //Q+W+E
+                    if (E.IsInRange(target))
+                    {
+                        if (Q.IsReady() && useQhr)
+                            Q.Cast(target);
+                        if (W.IsReady() && useWhr)
+                            W.Cast(target);
+                        if (E.IsReady())
+                            E.CastOnUnit(target);
+                    }
+
+                }
+            }
+
+        }
+
+        static void Combo()
+        {
+            Obj_AI_Hero target = TargetSelector.GetTarget(E.Range, DamageType.Magical);
+
+            if (target == null)
+                return;
+
+            if (Orbwalker.ActiveMode == OrbwalkerMode.Orbwalk && target.IsValidTarget() && !target.IsInvulnerable)
+            {
+                if (E.IsInRange(target))
+                {
+                    if (Q.IsReady() && config["combo"]["useQ"].GetValue<MenuBool>().Value)
+                        Q.Cast(target);
+                    if (W.IsReady() && config["combo"]["useW"].GetValue<MenuBool>().Value)
+                        W.Cast(target);
+                    if (E.IsReady())
+                        E.CastOnUnit(target);
+
+                    if (R.IsReady() && config["combo"]["useR"].GetValue<MenuBool>().Value)
+                        R.Cast(target);
+                }
+
+            }
+        }
+
+        static void OnDraw(EventArgs args)
+        {
+            if (config["drawing"]["drawQ"].GetValue<MenuBool>().Value)
+                Drawing.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.Green);
+
+            if (config["drawing"]["drawE"].GetValue<MenuBool>().Value)
+                Drawing.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Violet);
+            if (config["drawing"]["drawR"].GetValue<MenuBool>().Value)
+                Drawing.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Red);
+        }
+
+        static void Lasthit()
+        {
+            if (Orbwalker.ActiveMode == OrbwalkerMode.LastHit)
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy && minion.Distance(Player) <= Q.Range))
+                {
+                    if (Player.Distance(minion.ServerPosition) <= AutoAttackRange && Player.GetAutoAttackDamage(minion) > minion.Health)
+                        return;
+
+                    if (minion.Health < Qdmg(minion) && minion.Distance(Player) <= Q.Range && Q.IsReady() && config["farm"]["useqlh"].GetValue<MenuBool>().Value == true)
+                        Q.Cast(minion);
+
+                    if (minion.Health < Edmg(minion) && minion.Distance(Player) <= E.Range && E.IsReady() && config["farm"]["useelh"].GetValue<MenuBool>().Value == true)
+                        E.CastOnUnit(minion);
+
+                }
+            }
+        }
+
+        static void Laneclear()
+        {
+            if (Orbwalker.ActiveMode == OrbwalkerMode.LaneClear)
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy && minion.Distance(Player) <= Q.Range))
+                {
+                    if (Player.Distance(minion.ServerPosition) <= AutoAttackRange && Player.GetAutoAttackDamage(minion) > minion.Health)
+                        return;
+
+                    if (minion.Health < Qdmg(minion) && minion.Distance(Player) <= Q.Range && Q.IsReady())
+                        Q.CastOnUnit(minion);
+
+                    if (minion.Health < Wdmg(minion) && minion.Distance(Player) <= W.Range)
+                        W.Cast(minion);
+
+                    if (minion.Health < Edmg(minion) && minion.Distance(Player) <= E.Range && E.IsReady())
+                        E.CastOnUnit(minion);
+
+                }
+            }
+        }
+    }
+}
+
