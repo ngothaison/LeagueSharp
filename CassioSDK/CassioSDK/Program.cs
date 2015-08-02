@@ -14,7 +14,7 @@ using LeagueSharp.SDK.Core.UI.IMenu;
 using LeagueSharp.SDK.Core.UI.IMenu.Values;
 using SharpDX;
 using LeagueSharp.SDK.Core.Events;
-using LeagueSharp.SDK.Core.IDrawing;
+
 using Menu = LeagueSharp.SDK.Core.UI.IMenu.Menu;
 
 
