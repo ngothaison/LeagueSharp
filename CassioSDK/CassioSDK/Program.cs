@@ -62,7 +62,7 @@ namespace Cassiopeia
             combo.Add(new MenuBool("useQ", "Use Q",true));
             combo.Add(new MenuBool("useW", "Use W",true));
             combo.Add(new MenuBool("useR", "Use R",true));
-            combo.Add(new MenuBool("useIgnite", "Use Ignite In Combo", true));
+            combo.Add(new MenuBool("useIgnite", "Use Ignite In Combo"));
 
             var harass = config.Add(new Menu("harass", "Harass Settings"));
 
