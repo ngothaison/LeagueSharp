@@ -26,7 +26,7 @@ namespace sBrand
         {
             if (player.ChampionName != "Brand")
                 return;
-
+            Game.PrintChat("sBrand loaded!");
             Q = new Spell(SpellSlot.Q, 1050f);
             W = new Spell(SpellSlot.W, 900f);
             E = new Spell(SpellSlot.E, 625f);
@@ -47,10 +47,12 @@ namespace sBrand
             menu.AddSubMenu(tsMenu);
             //Combo Menu
             menu.AddSubMenu(new Menu("Combo", "sBrand.Combo"));
-            menu.SubMenu("sBrand.Combo").AddItem(new MenuItem("Combo.Mode", "Mode").SetValue(new StringList(new[] { "W+Q+E+R", "E+Q+W+R" })));
+            menu.SubMenu("sBrand.Combo").AddItem(new MenuItem("Combo.Mode", "Mode").SetValue(new StringList(new[] { "W+Q+E+R", "E+Q+W+R", "Q+E+W+R","R+E+W+Q"})));
             menu.SubMenu("sBrand.Combo").AddItem(new MenuItem("Combo.UseIgnite", "Use Ignite").SetValue(false));
             menu.SubMenu("sBrand.Combo").AddSubMenu(new Menu("Mode W+Q+E+R delay", "Combo.Mode1Delay"));
             menu.SubMenu("sBrand.Combo").AddSubMenu(new Menu("Mode E+Q+W+R delay", "Combo.Mode2Delay"));
+            menu.SubMenu("sBrand.Combo").AddSubMenu(new Menu("Mode Q+E+W+R delay", "Combo.Mode3Delay"));
+            menu.SubMenu("sBrand.Combo").AddSubMenu(new Menu("Mode R+E+W+Q delay", "Combo.Mode4Delay"));
 
             menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode1Delay").AddItem(new MenuItem("Combo.Mode1Delay.Q", "Q delay").SetValue(new Slider(900, 0, 2000)));
             menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode1Delay").AddItem(new MenuItem("Combo.Mode1Delay.W", "W delay").SetValue(new Slider(100, 0, 2000)));
@@ -61,6 +63,16 @@ namespace sBrand
             menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode2Delay").AddItem(new MenuItem("Combo.Mode2Delay.W", "W delay").SetValue(new Slider(700, 0, 2000)));
             menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode2Delay").AddItem(new MenuItem("Combo.Mode2Delay.E", "E delay").SetValue(new Slider(100, 0, 2000)));
             menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode2Delay").AddItem(new MenuItem("Combo.Mode2Delay.R", "R delay").SetValue(new Slider(600, 0, 2000)));
+
+            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode3Delay").AddItem(new MenuItem("Combo.Mode3Delay.Q", "Q delay").SetValue(new Slider(100, 0, 2000)));
+            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode3Delay").AddItem(new MenuItem("Combo.Mode3Delay.W", "W delay").SetValue(new Slider(500, 0, 2000)));
+            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode3Delay").AddItem(new MenuItem("Combo.Mode3Delay.E", "E delay").SetValue(new Slider(500, 0, 2000)));
+            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode3Delay").AddItem(new MenuItem("Combo.Mode3Delay.R", "R delay").SetValue(new Slider(500, 0, 2000)));
+
+            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode4Delay").AddItem(new MenuItem("Combo.Mode4Delay.Q", "Q delay").SetValue(new Slider(400, 0, 2000)));
+            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode4Delay").AddItem(new MenuItem("Combo.Mode4Delay.W", "W delay").SetValue(new Slider(500, 0, 2000)));
+            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode4Delay").AddItem(new MenuItem("Combo.Mode4Delay.E", "E delay").SetValue(new Slider(600, 0, 2000)));
+            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode4Delay").AddItem(new MenuItem("Combo.Mode4Delay.R", "R delay").SetValue(new Slider(100, 0, 2000)));
             //Harass Menu
             menu.AddSubMenu(new Menu("Harass", "sBrand.Harass"));
             menu.SubMenu("sBrand.Harass").AddItem(new MenuItem("Harass.Mode", "Mode").SetValue(new StringList(new[] { "W+Q", "E+Q", "E+W", "W+Q+E", "E+Q+W" })));
@@ -212,6 +224,16 @@ namespace sBrand
             var Edelay2 = menu.Item("Combo.Mode2Delay.E").GetValue<Slider>().Value;
             var Rdelay2 = menu.Item("Combo.Mode2Delay.R").GetValue<Slider>().Value;
 
+            var Qdelay3 = menu.Item("Combo.Mode3Delay.Q").GetValue<Slider>().Value;
+            var Wdelay3 = menu.Item("Combo.Mode3Delay.W").GetValue<Slider>().Value;
+            var Edelay3 = menu.Item("Combo.Mode3Delay.E").GetValue<Slider>().Value;
+            var Rdelay3 = menu.Item("Combo.Mode3Delay.R").GetValue<Slider>().Value;
+
+            var Qdelay4 = menu.Item("Combo.Mode4Delay.Q").GetValue<Slider>().Value;
+            var Wdelay4 = menu.Item("Combo.Mode4Delay.W").GetValue<Slider>().Value;
+            var Edelay4 = menu.Item("Combo.Mode4Delay.E").GetValue<Slider>().Value;
+            var Rdelay4 = menu.Item("Combo.Mode4Delay.R").GetValue<Slider>().Value;
+
             switch(mode)
             {
                 case 0:
@@ -268,6 +290,59 @@ namespace sBrand
                         if (useIgnite)
                         {
                             player.Spellbook.CastSpell(Ignite, target);
+                        }
+                    }
+                    break;
+
+                case 2:
+                    {
+                        if (Q.IsReady() && target.IsValidTarget(Q.Range))
+                        {
+                            Utility.DelayAction.Add(Qdelay3, () => Q.Cast(target));
+                        }
+
+                        if (E.IsReady() && target.IsValidTarget(E.Range))
+                        {
+                            Utility.DelayAction.Add(Edelay3, () => E.CastOnUnit(target));
+                        }
+
+                        if (W.IsReady() && target.IsValidTarget(W.Range))
+                        {
+                            Utility.DelayAction.Add(Wdelay3, () => W.Cast(target));
+                        }
+
+                        if (R.IsReady() && target.IsValidTarget(R.Range))
+                        {
+                            Utility.DelayAction.Add(Rdelay3, () => R.CastOnUnit(target));
+                        }
+
+                        if (useIgnite)
+                        {
+                            player.Spellbook.CastSpell(Ignite, target);
+                        }
+                    }
+                    break;
+
+                case 3:
+                    {
+                        if (R.IsReady() && target.IsValidTarget(R.Range))
+                        {
+                            Utility.DelayAction.Add(Rdelay4, () => R.CastOnUnit(target));
+                        }
+
+                        if (E.IsReady() && target.IsValidTarget(E.Range))
+                        {
+                            Utility.DelayAction.Add(Edelay4, () => E.CastOnUnit(target));
+                        }
+
+                        if (W.IsReady() && target.IsValidTarget(W.Range))
+                        {
+                            Utility.DelayAction.Add(Wdelay4, () => W.Cast(target));
+                        }
+
+                        if (Q.IsReady() && target.IsValidTarget(Q.Range))
+                        {
+                            Utility.DelayAction.Add(Qdelay4, () => Q.Cast(target));
                         }
                     }
                     break;
