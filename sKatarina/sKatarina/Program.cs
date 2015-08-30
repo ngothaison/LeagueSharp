@@ -15,13 +15,13 @@ namespace sKatarina
     {
         private static Obj_AI_Hero player;
         private static Spell Q, W, E, R;
-        private static bool _untiProcess=false;
+        
         private static SpellSlot IgniteSlot;
         private const int AutoAttackRange = 125;
         private const float overkill = 0.8f;
         private static Menu menu;
         public static Orbwalking.Orbwalker Orbwalker;
-        private static int LastQ, LastW, LastE;
+        
         private static int _lastPlaced;
         private static Vector3 _lastWardPos;
         static void Main(string[] args)
@@ -108,31 +108,11 @@ namespace sKatarina
 
             Game.OnUpdate+=Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            
             GameObject.OnCreate += GameObject_OnCreate;     
         }
 
-        static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (sender.IsMe)
-            {
-                if (args.SData.Name.ToLower()=="katarinaq")
-                {
-                    LastQ = Environment.TickCount;
-                }
-
-                if (args.SData.Name.ToLower() == "katarinaw")
-                {
-                    LastW = Environment.TickCount;
-                }
-
-                if (args.SData.Name.ToLower() == "katarinae")
-                {
-                    LastE = Environment.TickCount;
-                }
-            }
-        }
-
+        
         
 
         static void Drawing_OnDraw(EventArgs args)
@@ -157,8 +137,8 @@ namespace sKatarina
             }
             foreach (Obj_AI_Hero target in ObjectManager.Get<Obj_AI_Hero>().Where(target=>target.IsEnemy&&target.IsValidTarget(20000)&&!target.IsInvulnerable))
             {
-                float cbdmg = Combodmg();
-                int percent = (int)(cbdmg / target.Health * 100);
+                float cbdmg = GetComboDamage(target);
+                int percent = (int)((cbdmg / target.Health) * 100);
                 var pos = Drawing.WorldToScreen(target.Position);
                 if (percent <= 50)
                     Drawing.DrawText(pos.X, pos.Y, Color.Red, percent.ToString() + "%");
@@ -168,8 +148,8 @@ namespace sKatarina
                     Drawing.DrawText(pos.X, pos.Y, Color.Yellow, percent.ToString() + "%");
                 if (percent >= 100)
                 {
-                    Drawing.DrawText(pos.X, pos.Y, Color.Green, percent.ToString() + "%");
-                    Drawing.DrawText(pos.X, pos.Y + 20, Color.Green, "Killable");
+                    Drawing.DrawText(pos.X, pos.Y, Color.White, percent.ToString() + "%");
+                    Drawing.DrawText(pos.X, pos.Y + 20, Color.White, "Killable");
                 }
             }
             
@@ -178,17 +158,17 @@ namespace sKatarina
         
         static void Game_OnUpdate(EventArgs args)
         {
-            if (player.IsChannelingImportantSpell() || player.HasBuff("KatarinaR"))
+            if (player.IsChannelingImportantSpell() || player.HasBuff("KatarinaR") || player.HasBuff("katarinarsound", true))
             {
                 Orbwalker.SetAttack(false);
-                Orbwalker.SetMovement(false);
-                
-                return;
+                Orbwalker.SetMovement(false);                                
             }
-            Orbwalker.SetAttack(true);
-            Orbwalker.SetMovement(true);
-           
-
+            else
+            {
+                Orbwalker.SetAttack(true);
+                Orbwalker.SetMovement(true);
+            }
+                      
             switch(Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo: Combo();
@@ -250,17 +230,17 @@ namespace sKatarina
             }
         }
         static void Harass()
-        {
-            var mode = menu.Item("hMode").GetValue<StringList>().SelectedIndex;
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            var Qdelay1=menu.Item("Qdelayh1").GetValue<Slider>().Value;
-            var Wdelay1=menu.Item("Wdelayh1").GetValue<Slider>().Value;
-            var Edelay1=menu.Item("Edelayh1").GetValue<Slider>().Value;
-            var Qdelay2 = menu.Item("Qdelayh2").GetValue<Slider>().Value;
-            var Wdelay2 = menu.Item("Wdelayh2").GetValue<Slider>().Value;
-            var Edelay2 = menu.Item("Edelayh2").GetValue<Slider>().Value;
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed&&!_untiProcess&&target.IsEnemy)
+        {            
+            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
             {
+                var mode = menu.Item("hMode").GetValue<StringList>().SelectedIndex;
+                var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+                var Qdelay1 = menu.Item("Qdelayh1").GetValue<Slider>().Value;
+                var Wdelay1 = menu.Item("Wdelayh1").GetValue<Slider>().Value;
+                var Edelay1 = menu.Item("Edelayh1").GetValue<Slider>().Value;
+                var Qdelay2 = menu.Item("Qdelayh2").GetValue<Slider>().Value;
+                var Wdelay2 = menu.Item("Wdelayh2").GetValue<Slider>().Value;
+                var Edelay2 = menu.Item("Edelayh2").GetValue<Slider>().Value;
                 switch (mode)
                 {
                     case 0:
@@ -268,17 +248,17 @@ namespace sKatarina
 
                             if (Q.IsReady())
                                 Utility.DelayAction.Add(Qdelay1, () => Q.CastOnUnit(target));
-                                //Q.CastOnUnit(target);
+                                
                         }
                         break;
                     case 1:
                         {
                             if (Q.IsReady() && target.IsValidTarget(Q.Range))
                                 Utility.DelayAction.Add(Qdelay1, () => Q.CastOnUnit(target));
-                                //Q.CastOnUnit(target);
+                                
                             if (W.IsReady() && W.IsInRange(target) && target.IsValidTarget(W.Range))
                                 Utility.DelayAction.Add(Wdelay1, () => W.Cast());
-                                //W.Cast();                            
+                                                         
                            
                         }
                         break;
@@ -286,13 +266,13 @@ namespace sKatarina
                         {
                             if (Q.IsReady() && target.IsValidTarget(Q.Range))
                                 Utility.DelayAction.Add(Qdelay1, () => Q.CastOnUnit(target));
-                                //Q.CastOnUnit(target);
+                                
                             if (E.IsReady() && target.IsValidTarget(E.Range))
                                 Utility.DelayAction.Add(Edelay1, () => E.Cast(target));
-                                //E.Cast(target);
+                                
                             if (W.IsReady())
                                 Utility.DelayAction.Add(Wdelay1, () => W.Cast());
-                                //W.Cast();
+                               
                            
 
                         }
@@ -301,13 +281,13 @@ namespace sKatarina
                         {
                             if (E.IsReady() && target.IsValidTarget(E.Range))
                                 Utility.DelayAction.Add(Edelay2, () => E.Cast(target));
-                                //E.Cast(target);
+                                
                             if (Q.IsReady() && target.IsValidTarget(Q.Range))
                                 Utility.DelayAction.Add(Qdelay2, () => Q.CastOnUnit(target));
-                                //Q.CastOnUnit(target);                           
+                                                           
                             if (W.IsReady())
                                 Utility.DelayAction.Add(Wdelay2, () => W.Cast());
-                                //W.Cast();  
+                                
                            
                         }
                         break;
@@ -319,37 +299,37 @@ namespace sKatarina
 
         static void Combo()
         {
-            var mode = menu.Item("cbMode").GetValue<StringList>().SelectedIndex;
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            var useIg = menu.Item("Use Ignite in combo").GetValue<bool>();
-            var Qdelay1 = menu.Item("Qdelaycb1").GetValue<Slider>().Value;
-            var Wdelay1 = menu.Item("Wdelaycb1").GetValue<Slider>().Value;
-            var Edelay1 = menu.Item("Edelaycb1").GetValue<Slider>().Value;
-            var Rdelay1 = menu.Item("Rdelaycb1").GetValue<Slider>().Value;
-            var Qdelay2 = menu.Item("Qdelaycb2").GetValue<Slider>().Value;
-            var Wdelay2 = menu.Item("Wdelaycb2").GetValue<Slider>().Value;
-            var Edelay2 = menu.Item("Edelaycb2").GetValue<Slider>().Value;
-            var Rdelay2 = menu.Item("Rdelaycb2").GetValue<Slider>().Value;
-            if (Orbwalker.ActiveMode==Orbwalking.OrbwalkingMode.Combo&&!_untiProcess&&target.IsEnemy)
+            
+            if (Orbwalker.ActiveMode==Orbwalking.OrbwalkingMode.Combo)
             {
+                var mode = menu.Item("cbMode").GetValue<StringList>().SelectedIndex;
+                var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+                var useIg = menu.Item("Use Ignite in combo").GetValue<bool>();
+                var Qdelay1 = menu.Item("Qdelaycb1").GetValue<Slider>().Value;
+                var Wdelay1 = menu.Item("Wdelaycb1").GetValue<Slider>().Value;
+                var Edelay1 = menu.Item("Edelaycb1").GetValue<Slider>().Value;
+                var Rdelay1 = menu.Item("Rdelaycb1").GetValue<Slider>().Value;
+                var Qdelay2 = menu.Item("Qdelaycb2").GetValue<Slider>().Value;
+                var Wdelay2 = menu.Item("Wdelaycb2").GetValue<Slider>().Value;
+                var Edelay2 = menu.Item("Edelaycb2").GetValue<Slider>().Value;
+                var Rdelay2 = menu.Item("Rdelaycb2").GetValue<Slider>().Value;
                 switch(mode)
                 {
                     case 0:
                         {
                             if (Q.IsReady() && target.IsValidTarget(Q.Range))
                                 Utility.DelayAction.Add(Qdelay1, () => Q.CastOnUnit(target));
-                                //Q.CastOnUnit(target);
+                                
                             if (E.IsReady() && target.IsValidTarget(E.Range))
                                 Utility.DelayAction.Add(Edelay1, () => E.Cast(target));
-                                //E.Cast(target);                           
+                                                          
                             if (W.IsReady())
                                 Utility.DelayAction.Add(Wdelay1, () => W.Cast());
-                                //W.Cast();
+                                
                             if (R.IsReady())
                             {
-                                Orbwalker.SetMovement(false);
                                 Orbwalker.SetAttack(false);
-
+                                Orbwalker.SetMovement(false);
                                 Utility.DelayAction.Add(Rdelay1, () => R.Cast());
                             }
                             if (useIg && IgniteSlot.IsReady())
@@ -361,18 +341,17 @@ namespace sKatarina
                         {
                             if (E.IsReady() && target.IsValidTarget(E.Range))
                                 Utility.DelayAction.Add(Edelay2, () => E.Cast(target));
-                                //E.Cast(target);
+                               
                             if (Q.IsReady())
                                 Utility.DelayAction.Add(Qdelay2, () => Q.CastOnUnit(target));
-                                //Q.CastOnUnit(target);
+                                
                             if (W.IsReady())
                                 Utility.DelayAction.Add(Wdelay2, () => W.Cast());
-                                //W.Cast();
+                               
                             if (R.IsReady())
                             {
-                                Orbwalker.SetMovement(false);
                                 Orbwalker.SetAttack(false);
-
+                                Orbwalker.SetMovement(false);
                                 Utility.DelayAction.Add(Rdelay2, () => R.Cast());
                             }
                                
@@ -388,25 +367,24 @@ namespace sKatarina
             
         }
 
-        static float Combodmg()
+        private static float GetComboDamage(Obj_AI_Hero enemy)
         {
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            double Combodmg=0;
-            var QDmg = (Q.GetDamage(target)) * overkill;
-            var WDmg = (W.GetDamage(target)) * overkill;
-            var EDmg = (E.GetDamage(target)) * overkill;
-            var RDmg = (R.GetDamage(target)) * overkill;
-            var MarkDmg = (player.CalcDamage(target, Damage.DamageType.Magical, player.FlatMagicDamageMod * 0.15 + Q.Level * 15)) * overkill;
+            double damage = 0d;
+
             if (Q.IsReady())
-                Combodmg += QDmg;
+                damage += player.GetSpellDamage(enemy, SpellSlot.Q) + player.GetSpellDamage(enemy, SpellSlot.Q, 1);
+
             if (W.IsReady())
-                Combodmg += WDmg;
+                damage += player.GetSpellDamage(enemy, SpellSlot.W);
+
             if (E.IsReady())
-                Combodmg += EDmg;
-            if (R.IsReady())
-                Combodmg += RDmg;
-            Combodmg += MarkDmg;
-            return (float)Combodmg;
+                damage += player.GetSpellDamage(enemy, SpellSlot.E);
+
+            if (R.IsReady() || (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).State == SpellState.Surpressed && R.Level > 0))
+                damage += player.GetSpellDamage(enemy, SpellSlot.R) * 8;
+
+
+            return (float)damage;
         }
         
         static void KillSteal()
@@ -437,7 +415,7 @@ namespace sKatarina
                     ignitedmg = 0f;
                 }
 
-                if (target.Health<ignitedmg&&useIg&&IgniteSlot.IsReady()&&useIg)
+                if (target.Health<ignitedmg&&useIg&&IgniteSlot.IsReady())
                 {
                     player.Spellbook.CastSpell(IgniteSlot,target);
                 }
