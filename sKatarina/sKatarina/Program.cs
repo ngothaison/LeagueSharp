@@ -238,9 +238,7 @@ namespace sKatarina
                 var Qdelay1 = menu.Item("Qdelayh1").GetValue<Slider>().Value;
                 var Wdelay1 = menu.Item("Wdelayh1").GetValue<Slider>().Value;
                 var Edelay1 = menu.Item("Edelayh1").GetValue<Slider>().Value;
-                var Qdelay2 = menu.Item("Qdelayh2").GetValue<Slider>().Value;
-                var Wdelay2 = menu.Item("Wdelayh2").GetValue<Slider>().Value;
-                var Edelay2 = menu.Item("Edelayh2").GetValue<Slider>().Value;
+                
                 switch (mode)
                 {
                     case 0:
@@ -256,7 +254,7 @@ namespace sKatarina
                             if (Q.IsReady() && target.IsValidTarget(Q.Range))
                                 Utility.DelayAction.Add(Qdelay1, () => Q.CastOnUnit(target));
                                 
-                            if (W.IsReady() && W.IsInRange(target) && target.IsValidTarget(W.Range))
+                            if (W.IsReady() && W.IsInRange(target) && target.IsValidTarget(W.Range) && !Q.IsReady())
                                 Utility.DelayAction.Add(Wdelay1, () => W.Cast());
                                                          
                            
@@ -267,10 +265,10 @@ namespace sKatarina
                             if (Q.IsReady() && target.IsValidTarget(Q.Range))
                                 Utility.DelayAction.Add(Qdelay1, () => Q.CastOnUnit(target));
                                 
-                            if (E.IsReady() && target.IsValidTarget(E.Range))
+                            if (E.IsReady() && target.IsValidTarget(E.Range) && !Q.IsReady())
                                 Utility.DelayAction.Add(Edelay1, () => E.Cast(target));
-                                
-                            if (W.IsReady())
+
+                            if (W.IsReady() && !E.IsReady())
                                 Utility.DelayAction.Add(Wdelay1, () => W.Cast());
                                
                            
@@ -279,13 +277,17 @@ namespace sKatarina
                         break;
                     case 3:
                         {
+
+                            var Qdelay2 = menu.Item("Qdelayh2").GetValue<Slider>().Value;
+                            var Wdelay2 = menu.Item("Wdelayh2").GetValue<Slider>().Value;
+                            var Edelay2 = menu.Item("Edelayh2").GetValue<Slider>().Value;
                             if (E.IsReady() && target.IsValidTarget(E.Range))
                                 Utility.DelayAction.Add(Edelay2, () => E.Cast(target));
                                 
-                            if (Q.IsReady() && target.IsValidTarget(Q.Range))
+                            if (Q.IsReady() && target.IsValidTarget(Q.Range) && !E.IsReady())
                                 Utility.DelayAction.Add(Qdelay2, () => Q.CastOnUnit(target));
                                                            
-                            if (W.IsReady())
+                            if (W.IsReady() && !Q.IsReady())
                                 Utility.DelayAction.Add(Wdelay2, () => W.Cast());
                                 
                            
@@ -305,57 +307,61 @@ namespace sKatarina
                 var mode = menu.Item("cbMode").GetValue<StringList>().SelectedIndex;
                 var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
                 var useIg = menu.Item("Use Ignite in combo").GetValue<bool>();
-                var Qdelay1 = menu.Item("Qdelaycb1").GetValue<Slider>().Value;
-                var Wdelay1 = menu.Item("Wdelaycb1").GetValue<Slider>().Value;
-                var Edelay1 = menu.Item("Edelaycb1").GetValue<Slider>().Value;
-                var Rdelay1 = menu.Item("Rdelaycb1").GetValue<Slider>().Value;
-                var Qdelay2 = menu.Item("Qdelaycb2").GetValue<Slider>().Value;
-                var Wdelay2 = menu.Item("Wdelaycb2").GetValue<Slider>().Value;
-                var Edelay2 = menu.Item("Edelaycb2").GetValue<Slider>().Value;
-                var Rdelay2 = menu.Item("Rdelaycb2").GetValue<Slider>().Value;
+                
+                
                 switch(mode)
                 {
                     case 0:
                         {
+                            var Qdelay1 = menu.Item("Qdelaycb1").GetValue<Slider>().Value;
+                            var Wdelay1 = menu.Item("Wdelaycb1").GetValue<Slider>().Value;
+                            var Edelay1 = menu.Item("Edelaycb1").GetValue<Slider>().Value;
+                            var Rdelay1 = menu.Item("Rdelaycb1").GetValue<Slider>().Value;
+
                             if (Q.IsReady() && target.IsValidTarget(Q.Range))
                                 Utility.DelayAction.Add(Qdelay1, () => Q.CastOnUnit(target));
                                 
-                            if (E.IsReady() && target.IsValidTarget(E.Range))
+                            if (E.IsReady() && target.IsValidTarget(E.Range) && !Q.IsReady())
                                 Utility.DelayAction.Add(Edelay1, () => E.Cast(target));
-                                                          
-                            if (W.IsReady())
+
+                            if (W.IsReady() && !E.IsReady())
                                 Utility.DelayAction.Add(Wdelay1, () => W.Cast());
                                 
-                            if (R.IsReady())
+                            if (R.IsReady() && !W.IsReady())
                             {
                                 Orbwalker.SetAttack(false);
                                 Orbwalker.SetMovement(false);
                                 Utility.DelayAction.Add(Rdelay1, () => R.Cast());
                             }
-                            if (useIg && IgniteSlot.IsReady())
+                            if (useIg && IgniteSlot.IsReady() && !R.IsReady())
                                 player.Spellbook.CastSpell(IgniteSlot, target);                           
                             
                         }
                         break;
                     case 1:
                         {
+                            var Qdelay2 = menu.Item("Qdelaycb2").GetValue<Slider>().Value;
+                            var Wdelay2 = menu.Item("Wdelaycb2").GetValue<Slider>().Value;
+                            var Edelay2 = menu.Item("Edelaycb2").GetValue<Slider>().Value;
+                            var Rdelay2 = menu.Item("Rdelaycb2").GetValue<Slider>().Value;
+
                             if (E.IsReady() && target.IsValidTarget(E.Range))
                                 Utility.DelayAction.Add(Edelay2, () => E.Cast(target));
-                               
-                            if (Q.IsReady())
+
+                            if (Q.IsReady() && !E.IsReady())
                                 Utility.DelayAction.Add(Qdelay2, () => Q.CastOnUnit(target));
                                 
-                            if (W.IsReady())
+                            if (W.IsReady() && !Q.IsReady())
                                 Utility.DelayAction.Add(Wdelay2, () => W.Cast());
                                
-                            if (R.IsReady())
+                            if (R.IsReady() && !W.IsReady())
                             {
                                 Orbwalker.SetAttack(false);
                                 Orbwalker.SetMovement(false);
                                 Utility.DelayAction.Add(Rdelay2, () => R.Cast());
                             }
                                
-                            if (useIg && IgniteSlot.IsReady())
+                            if (useIg && IgniteSlot.IsReady() && !R.IsReady())
                                 player.Spellbook.CastSpell(IgniteSlot, target);
                             
                             
@@ -464,7 +470,7 @@ namespace sKatarina
                     W.Cast();
                 }
 
-                if (target.Health < (Qdmg + Edmg + Wdmg + Markdmg+ignitedmg) && Q.IsReady() && W.IsReady() && E.IsReady()&&IgniteSlot.IsReady() && E.IsInRange(target))
+                if (target.Health < (Qdmg + Edmg + Wdmg + Markdmg+ignitedmg) && Q.IsReady() && W.IsReady() && E.IsReady()&&IgniteSlot.IsReady() && E.IsInRange(target) && useIg)
                 {
                     Q.CastOnUnit(target);
                     E.Cast(target);
