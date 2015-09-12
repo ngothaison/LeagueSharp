@@ -7,6 +7,9 @@ using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
 
+using Color = System.Drawing.Color;
+
+
 namespace sBrand
 {
     class Program
@@ -18,7 +21,6 @@ namespace sBrand
         private static Menu menu;
         static void Main(string[] args)
         {
-            
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
@@ -33,7 +35,6 @@ namespace sBrand
             R = new Spell(SpellSlot.R, 750f);
             Q.SetSkillshot(0.25f, 60, 1600, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.85f, 240, float.MaxValue, false, SkillshotType.SkillshotCircle);
-           
 
             Ignite = player.GetSpellSlot("summonerdot");
 
@@ -46,98 +47,138 @@ namespace sBrand
             TargetSelector.AddToMenu(tsMenu);
             menu.AddSubMenu(tsMenu);
             //Combo Menu
-            menu.AddSubMenu(new Menu("Combo", "sBrand.Combo"));
-            menu.SubMenu("sBrand.Combo").AddItem(new MenuItem("Combo.Mode", "Mode").SetValue(new StringList(new[] { "W+Q+E+R", "E+Q+W+R", "Q+E+W+R","R+E+W+Q"})));
-            menu.SubMenu("sBrand.Combo").AddItem(new MenuItem("Combo.UseIgnite", "Use Ignite").SetValue(false));
-            menu.SubMenu("sBrand.Combo").AddSubMenu(new Menu("Mode W+Q+E+R delay", "Combo.Mode1Delay"));
-            menu.SubMenu("sBrand.Combo").AddSubMenu(new Menu("Mode E+Q+W+R delay", "Combo.Mode2Delay"));
-            menu.SubMenu("sBrand.Combo").AddSubMenu(new Menu("Mode Q+E+W+R delay", "Combo.Mode3Delay"));
-            menu.SubMenu("sBrand.Combo").AddSubMenu(new Menu("Mode R+E+W+Q delay", "Combo.Mode4Delay"));
-
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode1Delay").AddItem(new MenuItem("Combo.Mode1Delay.Q", "Q delay").SetValue(new Slider(900, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode1Delay").AddItem(new MenuItem("Combo.Mode1Delay.W", "W delay").SetValue(new Slider(100, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode1Delay").AddItem(new MenuItem("Combo.Mode1Delay.E", "E delay").SetValue(new Slider(300, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode1Delay").AddItem(new MenuItem("Combo.Mode1Delay.R", "R delay").SetValue(new Slider(500, 0, 2000)));
-
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode2Delay").AddItem(new MenuItem("Combo.Mode2Delay.Q", "Q delay").SetValue(new Slider(400, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode2Delay").AddItem(new MenuItem("Combo.Mode2Delay.W", "W delay").SetValue(new Slider(700, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode2Delay").AddItem(new MenuItem("Combo.Mode2Delay.E", "E delay").SetValue(new Slider(100, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode2Delay").AddItem(new MenuItem("Combo.Mode2Delay.R", "R delay").SetValue(new Slider(600, 0, 2000)));
-
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode3Delay").AddItem(new MenuItem("Combo.Mode3Delay.Q", "Q delay").SetValue(new Slider(100, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode3Delay").AddItem(new MenuItem("Combo.Mode3Delay.W", "W delay").SetValue(new Slider(500, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode3Delay").AddItem(new MenuItem("Combo.Mode3Delay.E", "E delay").SetValue(new Slider(500, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode3Delay").AddItem(new MenuItem("Combo.Mode3Delay.R", "R delay").SetValue(new Slider(500, 0, 2000)));
-
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode4Delay").AddItem(new MenuItem("Combo.Mode4Delay.Q", "Q delay").SetValue(new Slider(400, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode4Delay").AddItem(new MenuItem("Combo.Mode4Delay.W", "W delay").SetValue(new Slider(500, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode4Delay").AddItem(new MenuItem("Combo.Mode4Delay.E", "E delay").SetValue(new Slider(600, 0, 2000)));
-            menu.SubMenu("sBrand.Combo").SubMenu("Combo.Mode4Delay").AddItem(new MenuItem("Combo.Mode4Delay.R", "R delay").SetValue(new Slider(100, 0, 2000)));
+            menu.AddSubMenu(new Menu("Combo", "Combo"));
+            menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseQ", "Use Q").SetValue(true));
+            menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseW", "Use W").SetValue(true));
+            menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseE", "Use E").SetValue(true));
+            menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseR", "Use R").SetValue(true));
+            menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseIgnite", "Use Ignite").SetValue(false));
             //Harass Menu
-            menu.AddSubMenu(new Menu("Harass", "sBrand.Harass"));
-            menu.SubMenu("sBrand.Harass").AddItem(new MenuItem("Harass.Mode", "Mode").SetValue(new StringList(new[] { "W+Q", "E+Q", "E+W", "W+Q+E", "E+Q+W" })));
-            menu.SubMenu("sBrand.Harass").AddSubMenu(new Menu("Mode W+Q delay", "Harass.Mode1Delay"));
-            menu.SubMenu("sBrand.Harass").AddSubMenu(new Menu("Mode E+Q delay", "Harass.Mode2Delay"));
-            menu.SubMenu("sBrand.Harass").AddSubMenu(new Menu("Mode E+W delay", "Harass.Mode3Delay"));
-            menu.SubMenu("sBrand.Harass").AddSubMenu(new Menu("Mode W+Q+E delay", "Harass.Mode4Delay"));
-            menu.SubMenu("sBrand.Harass").AddSubMenu(new Menu("Mode E+Q+W delay", "Harass.Mode5Delay"));
-
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode1Delay").AddItem(new MenuItem("Harass.Mode1Delay.Q","Q delay").SetValue(new Slider(900, 0, 2000)));
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode1Delay").AddItem(new MenuItem("Harass.Mode1Delay.W","W delay").SetValue(new Slider(100, 0, 2000)));
-
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode2Delay").AddItem(new MenuItem("Harass.Mode2Delay.Q", "Q delay").SetValue(new Slider(400, 0, 2000)));
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode2Delay").AddItem(new MenuItem("Harass.Mode2Delay.E", "E delay").SetValue(new Slider(100, 0, 2000)));
-
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode3Delay").AddItem(new MenuItem("Harass.Mode3Delay.W", "W delay").SetValue(new Slider(300, 0, 2000)));
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode3Delay").AddItem(new MenuItem("Harass.Mode3Delay.E", "E delay").SetValue(new Slider(100, 0, 2000)));
-
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode4Delay").AddItem(new MenuItem("Harass.Mode4Delay.Q", "Q delay").SetValue(new Slider(1000, 0, 2000)));
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode4Delay").AddItem(new MenuItem("Harass.Mode4Delay.W", "W delay").SetValue(new Slider(100, 0, 2000)));
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode4Delay").AddItem(new MenuItem("Harass.Mode4Delay.E", "E delay").SetValue(new Slider(400, 0, 2000)));
-
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode5Delay").AddItem(new MenuItem("Harass.Mode5Delay.Q", "Q delay").SetValue(new Slider(300, 0, 2000)));
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode5Delay").AddItem(new MenuItem("Harass.Mode5Delay.W", "W delay").SetValue(new Slider(700, 0, 2000)));
-            menu.SubMenu("sBrand.Harass").SubMenu("Harass.Mode5Delay").AddItem(new MenuItem("Harass.Mode5Delay.E", "E delay").SetValue(new Slider(100, 0, 2000)));
-            //KS menu
-            menu.AddSubMenu(new Menu("Kill Steal", "sBrand.KillSteal"));
-            menu.SubMenu("sBrand.KillSteal").AddItem(new MenuItem("KillSteal.Enable", "Enable").SetValue(true));
-            menu.SubMenu("sBrand.KillSteal").AddItem(new MenuItem("KillSteal.Q", "Use Q").SetValue(true));
-            menu.SubMenu("sBrand.KillSteal").AddItem(new MenuItem("KillSteal.W", "Use W").SetValue(true));
-            menu.SubMenu("sBrand.KillSteal").AddItem(new MenuItem("KillSteal.E", "Use E").SetValue(true));
-            menu.SubMenu("sBrand.KillSteal").AddItem(new MenuItem("KillSteal.Ignite", "Use Ignite").SetValue(false));
+            menu.AddSubMenu(new Menu("Harass", "Harass"));
+            menu.SubMenu("Harass").AddItem(new MenuItem("Harass.UseQ", "Use Q").SetValue(true));
+            menu.SubMenu("Harass").AddItem(new MenuItem("Harass.UseW", "Use W").SetValue(true));
+            menu.SubMenu("Harass").AddItem(new MenuItem("Harass.UseE", "Use E").SetValue(true));
+            //Combat Modes.Thanks YLiCiOUS !
+            menu.AddSubMenu(new Menu("Combat Modes", "CombatMode"));
+            menu.SubMenu("CombatMode").AddItem(new MenuItem("CombatMode.Mode", "Mode").SetValue(new StringList(new[] { "Q+E+W+R", "R+E+W+Q" })));
+            menu.SubMenu("CombatMode").AddItem(new MenuItem("CombatMode.Key", "Key").SetValue(new KeyBind('T', KeyBindType.Press)));
+            //KS Menu
+            menu.AddSubMenu(new Menu("Kill Steal", "KillSteal"));
+            menu.SubMenu("KillSteal").AddItem(new MenuItem("KillSteal.Q", "Use Q").SetValue(true));
+            menu.SubMenu("KillSteal").AddItem(new MenuItem("KillSteal.W", "Use W").SetValue(true));
+            menu.SubMenu("KillSteal").AddItem(new MenuItem("KillSteal.E", "Use E").SetValue(true));
+            menu.SubMenu("KillSteal").AddItem(new MenuItem("KillSteal.Ignite", "Use Ignite").SetValue(false));
             //Farm menu
-            menu.AddSubMenu(new Menu("Farming", "sBrand.Farm"));
-            menu.SubMenu("sBrand.Farm").AddItem(new MenuItem("Farm.Q", "Use Q").SetValue(true));
-            menu.SubMenu("sBrand.Farm").AddItem(new MenuItem("Farm.W", "Use W").SetValue(true));
-            menu.SubMenu("sBrand.Farm").AddItem(new MenuItem("Farm.E", "Use E").SetValue(true));
+            menu.AddSubMenu(new Menu("Farming", "Farm"));
+            menu.SubMenu("Farm").AddItem(new MenuItem("Farm.Q", "Use Q").SetValue(true));
+            menu.SubMenu("Farm").AddItem(new MenuItem("Farm.W", "Use W").SetValue(true));
+            menu.SubMenu("Farm").AddItem(new MenuItem("Farm.E", "Use E").SetValue(true));
+            //LC
+            menu.AddSubMenu(new Menu("Lane Clean", "LaneClean"));
+            menu.SubMenu("LaneClean").AddItem(new MenuItem("LaneClean.Q", "Use Q").SetValue(true));
+            menu.SubMenu("LaneClean").AddItem(new MenuItem("LaneClean.W", "Use W").SetValue(true));
+            menu.SubMenu("LaneClean").AddItem(new MenuItem("LaneClean.E", "Use E").SetValue(true));
+            //Mana Manager
+            menu.AddSubMenu(new Menu("Mana Manager", "ManaManager"));
+            menu.SubMenu("ManaManager").AddItem(new MenuItem("ManaManager.Value", "Use harass, laneclean, farm, combo if mana >= ").SetValue(new Slider(20, 0, 100)));
+            menu.SubMenu("ManaManager").AddItem(new MenuItem("ManaManager.Combo", "Apply with combo").SetValue(false));
+            menu.SubMenu("ManaManager").AddItem(new MenuItem("ManaManager.Harass", "Apply with harass").SetValue(true));
+            menu.SubMenu("ManaManager").AddItem(new MenuItem("ManaManager.Farm", "Apply with farm").SetValue(true));
+            menu.SubMenu("ManaManager").AddItem(new MenuItem("ManaManager.LaneClean", "Apply with laneclean").SetValue(true));
+            //Auto lever
+            //menu.AddSubMenu(new Menu("Auto Level up", "AutoLeveler"));
+            //menu.SubMenu("AutoLeveler").AddItem(new MenuItem("AutoLeveler.Enable", "Enable").SetValue(true));
             //Gap closer
             menu.AddSubMenu(new Menu("Gap Closer", "sBrand.GapCloser"));
-            menu.SubMenu("sBrand.GapCloser").AddItem(new MenuItem("GapCloser.Enable", "Auto stun on gap closer (E+Q)").SetValue(true));
+            menu.SubMenu("GapCloser").AddItem(new MenuItem("GapCloser.Enable", "Auto stun on gap closer (E+Q)").SetValue(true));
             //Interrupts
             menu.AddSubMenu(new Menu("Interrupts", "sBrand.Interrupts"));
-            menu.SubMenu("sBrand.Interrupts").AddItem(new MenuItem("Interrupts.Enable", "Interrupts spell with E+Q").SetValue(true));
+            menu.SubMenu("Interrupts").AddItem(new MenuItem("Interrupts.Enable", "Interrupts spell with E+Q").SetValue(true));
             //Drawing
             menu.AddSubMenu(new Menu("Drawing", "sBrand.Drawing"));
-            menu.SubMenu("sBrand.Drawing").AddItem(new MenuItem("Drawing.Enable", "Enable").SetValue(true));
-            menu.SubMenu("sBrand.Drawing").AddItem(new MenuItem("Drawing.Q", "Draw Q Range").SetValue(true));
-            menu.SubMenu("sBrand.Drawing").AddItem(new MenuItem("Drawing.W", "Draw W Range").SetValue(true));
-            menu.SubMenu("sBrand.Drawing").AddItem(new MenuItem("Drawing.E", "Draw E Range").SetValue(true));
-            menu.SubMenu("sBrand.Drawing").AddItem(new MenuItem("Drawing.R", "Draw R Range").SetValue(true));
+            menu.SubMenu("Drawing").AddItem(new MenuItem("Drawing.Q", "Draw Q Range").SetValue(true));
+            menu.SubMenu("Drawing").AddItem(new MenuItem("Drawing.W", "Draw W Range").SetValue(true));
+            menu.SubMenu("Drawing").AddItem(new MenuItem("Drawing.E", "Draw E Range").SetValue(true));
+            menu.SubMenu("Drawing").AddItem(new MenuItem("Drawing.R", "Draw R Range").SetValue(true));
+            //Draw Damage
+            menu.AddSubMenu(new Menu("Draw Damage", "DrawDamage"));
+            menu.SubMenu("DrawDamage").AddItem(new MenuItem("DrawDamage.Enable", "Enable").SetValue(true));
+            menu.SubMenu("DrawDamage").AddItem(new MenuItem("DrawDamage.DrawColor", "Fill color").SetValue(new Circle(true, Color.FromArgb(204, 255, 0, 1))));
 
             menu.AddToMainMenu();
 
-            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
-            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            Game.OnUpdate += Game_OnUpdate;
+            DrawDamage.DamageToUnit = GetComboDamage;
+            DrawDamage.Enabled = menu.Item("DrawDamage.Enable").GetValue<bool>();
+            DrawDamage.Fill = menu.Item("DrawDamage.DrawColor").GetValue<Circle>().Active;
+            DrawDamage.FillColor = menu.Item("DrawDamage.DrawColor").GetValue<Circle>().Color;
+
+            menu.Item("DrawDamage.Enable").ValueChanged += delegate(object sender, OnValueChangeEventArgs eventArgs)
+            {
+                DrawDamage.Enabled = eventArgs.GetNewValue<bool>();
+            };
+
+            menu.Item("DrawDamage.DrawColor").ValueChanged += delegate(object sender, OnValueChangeEventArgs eventArgs)
+            {
+                DrawDamage.Fill = eventArgs.GetNewValue<Circle>().Active;
+                DrawDamage.FillColor = eventArgs.GetNewValue<Circle>().Color;
+            };
+
             Drawing.OnDraw += Drawing_OnDraw;
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+            Game.OnUpdate += Game_OnUpdate;            
+        }        
+        static void Game_OnUpdate(EventArgs args)
+        {
+            switch (Orbwalker.ActiveMode)
+            {
+                case Orbwalking.OrbwalkingMode.Combo: Combo();
+                    break;
+                case Orbwalking.OrbwalkingMode.Mixed: Harass();
+                    break;
+                case Orbwalking.OrbwalkingMode.LaneClear: LaneClean();
+                    break;
+                case Orbwalking.OrbwalkingMode.LastHit: Farm();
+                    break;
+            }
+
+            if (menu.Item("CombatMode.Key").GetValue<KeyBind>().Active)
+                Combat();
+
+            KillSteal();
+        }
+
+        static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
+        {
+            var enable = menu.Item("Interrupts.Enable").GetValue<bool>();
+            if (enable)
+            {
+                if (E.IsReady() && E.IsInRange(sender))
+                    E.CastOnUnit(sender);
+                if (Q.IsReady() && Q.IsInRange(sender) && sender.HasBuff("brandablaze"))                
+                    Q.CastIfHitchanceEquals(sender, HitChance.High);                
+            }
+        }
+
+        static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (gapcloser.Sender.IsAlly)
+                return;
+
+            var enable = menu.Item("GapCloser.Enable").GetValue<bool>();
+            if (enable)
+            {                
+                if (E.IsReady() && E.IsInRange(gapcloser.Sender))
+                    E.CastOnUnit(gapcloser.Sender);
+                if (Q.IsReady() && Q.IsInRange(gapcloser.Sender) && gapcloser.Sender.HasBuff("brandablaze"))
+                    Q.CastIfHitchanceEquals(gapcloser.Sender, HitChance.High);
+                
+            }
         }
 
         static void Drawing_OnDraw(EventArgs args)
         {
-            var enable = menu.Item("Drawing.Enable").GetValue<bool>();
-            if (enable)
-            {
-                var drawQ = menu.Item("Drawing.Q").GetValue<bool>();
+             var drawQ = menu.Item("Drawing.Q").GetValue<bool>();
                 var drawW = menu.Item("Drawing.W").GetValue<bool>();
                 var drawE = menu.Item("Drawing.E").GetValue<bool>();
                 var drawR = menu.Item("Drawing.R").GetValue<bool>();
@@ -152,326 +193,236 @@ namespace sBrand
                     Drawing.DrawCircle(player.Position, E.Range, System.Drawing.Color.BlueViolet);
 
                 if (drawR)
-                    Drawing.DrawCircle(player.Position, R.Range, System.Drawing.Color.Red);
-            }
+                    Drawing.DrawCircle(player.Position, R.Range, System.Drawing.Color.Red);   
         }
-
-        static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
-        {
-            if (gapcloser.Sender.IsAlly)
-                return;
-
-            var enable = menu.Item("GapCloser.Enable").GetValue<bool>();
-            if(enable)
-            {
-                var Qpre = Q.GetPrediction(gapcloser.Sender);
-                if(E.IsReady() && E.IsInRange(gapcloser.Sender))
-                    E.CastOnUnit(gapcloser.Sender);
-                if (Q.IsReady() && Q.IsInRange(gapcloser.Sender))
-                {
-                    Utility.DelayAction.Add(400, () => Q.Cast(Qpre.CastPosition));
-                }
-            }
-        }
-
-        static void Game_OnUpdate(EventArgs args)
-        {
-            switch(Orbwalker.ActiveMode)
-            {
-                case Orbwalking.OrbwalkingMode.Combo: Combo();
-                    break;
-                case Orbwalking.OrbwalkingMode.Mixed: Harass();
-                    break;
-                case Orbwalking.OrbwalkingMode.LaneClear: LaneClean();
-                    break;
-                case Orbwalking.OrbwalkingMode.LastHit: Farm();
-                    break;
-
-                var ks = menu.Item("KillSteal.Enable").GetValue<bool>();
-
-                if (ks)
-                     KillSteal();
-            }
-        }
-
-        static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
-        {
-            var enable = menu.Item("Interrupts.Enable").GetValue<bool>();
-            if (enable)
-            {
-                var Qpre = Q.GetPrediction(sender);
-                if(E.IsReady() && E.IsInRange(sender))
-                    E.CastOnUnit(sender);
-                if (Q.IsReady() && Q.IsInRange(sender))
-                {
-                    Utility.DelayAction.Add(350, () => Q.Cast(Qpre.CastPosition));
-                }
-            }
-        }
+        
+        
         static void Combo()
         {
-            var mode = menu.Item("Combo.Mode").GetValue<StringList>().SelectedIndex;
+            var manaCombo = menu.Item("ManaManager.Combo").GetValue<bool>();
+            var manapercent = menu.Item("ManaManager.Value").GetValue<Slider>().Value;
+            if (manaCombo && ((int) player.ManaPercent) < manapercent)
+                return;
+
+            var useQ = menu.Item("Combo.UseQ").GetValue<bool>();
+            var useW = menu.Item("Combo.UseW").GetValue<bool>();
+            var useE = menu.Item("Combo.UseE").GetValue<bool>();
+            var useR = menu.Item("Combo.UseR").GetValue<bool>();
             var useIgnite = menu.Item("Combo.UseIgnite").GetValue<bool>();
-            var target = TargetSelector.GetTarget(E.Range,TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
 
-            var Qdelay1 = menu.Item("Combo.Mode1Delay.Q").GetValue<Slider>().Value;
-            var Wdelay1 = menu.Item("Combo.Mode1Delay.W").GetValue<Slider>().Value;
-            var Edelay1 = menu.Item("Combo.Mode1Delay.E").GetValue<Slider>().Value;
-            var Rdelay1 = menu.Item("Combo.Mode1Delay.R").GetValue<Slider>().Value;
-
-            var Qdelay2 = menu.Item("Combo.Mode2Delay.Q").GetValue<Slider>().Value;
-            var Wdelay2 = menu.Item("Combo.Mode2Delay.W").GetValue<Slider>().Value;
-            var Edelay2 = menu.Item("Combo.Mode2Delay.E").GetValue<Slider>().Value;
-            var Rdelay2 = menu.Item("Combo.Mode2Delay.R").GetValue<Slider>().Value;
-
-            var Qdelay3 = menu.Item("Combo.Mode3Delay.Q").GetValue<Slider>().Value;
-            var Wdelay3 = menu.Item("Combo.Mode3Delay.W").GetValue<Slider>().Value;
-            var Edelay3 = menu.Item("Combo.Mode3Delay.E").GetValue<Slider>().Value;
-            var Rdelay3 = menu.Item("Combo.Mode3Delay.R").GetValue<Slider>().Value;
-
-            var Qdelay4 = menu.Item("Combo.Mode4Delay.Q").GetValue<Slider>().Value;
-            var Wdelay4 = menu.Item("Combo.Mode4Delay.W").GetValue<Slider>().Value;
-            var Edelay4 = menu.Item("Combo.Mode4Delay.E").GetValue<Slider>().Value;
-            var Rdelay4 = menu.Item("Combo.Mode4Delay.R").GetValue<Slider>().Value;
-
-            switch(mode)
+            if (target != null)
             {
-                case 0:
+                if (player.Distance(target.Position) < E.Range)
+                {
+                    if (useE && E.IsReady() && target.IsValidTarget(E.Range))
+                        CastE(target);
+
+                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
-                        if (W.IsReady() && target.IsValidTarget(W.Range))
-                        {
-                            Utility.DelayAction.Add(Wdelay1, () => W.Cast(target));
-                        }
-
-                        if(Q.IsReady() && target.IsValidTarget(Q.Range))
-                        {                            
-                            Utility.DelayAction.Add(Qdelay1, () => Q.Cast(target));
-                        }
-
-                        if (E.IsReady() && target.IsValidTarget(E.Range))
-                        {
-                            Utility.DelayAction.Add(Edelay1, () => E.CastOnUnit(target));
-                        }
-
-                        if (R.IsReady() && target.IsValidTarget(R.Range))
-                        {
-                            Utility.DelayAction.Add(Rdelay1, () => R.CastOnUnit(target));
-                        }
-
-                        if (useIgnite)
-                        {
-                            player.Spellbook.CastSpell(Ignite, target);
-                        }
+                        if (target.HasBuff("brandablaze"))
+                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        else
+                            Q.CastIfHitchanceEquals(target, HitChance.High);
                     }
-                    break;
 
-                case 1:
+                    if (W.IsReady() && useW && target.IsValidTarget(W.Range))
                     {
-                        if (E.IsReady() && target.IsValidTarget(E.Range))
-                        {
-                            Utility.DelayAction.Add(Edelay2, () => E.CastOnUnit(target));
-                        }
-
-                        if (Q.IsReady() && target.IsValidTarget(Q.Range))
-                        {                           
-                            Utility.DelayAction.Add(Qdelay2, () => Q.Cast(target));
-                        }
-
-                        if (W.IsReady() && target.IsValidTarget(W.Range))
-                        {
-                            Utility.DelayAction.Add(Wdelay2, () => W.Cast(target));
-                        }
-
-                        if (R.IsReady() && target.IsValidTarget(R.Range))
-                        {
-                            Utility.DelayAction.Add(Rdelay2, () => R.CastOnUnit(target));
-                        }
-
-                        if (useIgnite)
-                        {
-                            player.Spellbook.CastSpell(Ignite, target);
-                        }
+                        if (!Q.IsReady())
+                            W.CastIfHitchanceEquals(target, HitChance.High);
+                        else
+                            W.CastIfHitchanceEquals(target, HitChance.High);
                     }
-                    break;
 
-                case 2:
+                    if (useR && R.IsReady() && target.IsValidTarget(R.Range))
                     {
-                        if (Q.IsReady() && target.IsValidTarget(Q.Range))
-                        {
-                            Utility.DelayAction.Add(Qdelay3, () => Q.Cast(target));
-                        }
-
-                        if (E.IsReady() && target.IsValidTarget(E.Range))
-                        {
-                            Utility.DelayAction.Add(Edelay3, () => E.CastOnUnit(target));
-                        }
-
-                        if (W.IsReady() && target.IsValidTarget(W.Range))
-                        {
-                            Utility.DelayAction.Add(Wdelay3, () => W.Cast(target));
-                        }
-
-                        if (R.IsReady() && target.IsValidTarget(R.Range))
-                        {
-                            Utility.DelayAction.Add(Rdelay3, () => R.CastOnUnit(target));
-                        }
-
-                        if (useIgnite)
-                        {
-                            player.Spellbook.CastSpell(Ignite, target);
-                        }
+                        if (!W.IsReady())
+                            Utility.DelayAction.Add(1600, () => CastR(target));
+                        else
+                            Utility.DelayAction.Add(1600, () => CastR(target));
                     }
-                    break;
 
-                case 3:
+                    if (useIgnite && Ignite.IsReady() && !R.IsReady())
+                        player.Spellbook.CastSpell(Ignite, target);
+                }
+
+                else
+                {
+                    if (W.IsReady() && useW && target.IsValidTarget(W.Range))
+                        W.CastIfHitchanceEquals(target, HitChance.High);
+
+                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
-                        if (R.IsReady() && target.IsValidTarget(R.Range))
-                        {
-                            Utility.DelayAction.Add(Rdelay4, () => R.CastOnUnit(target));
-                        }
-
-                        if (E.IsReady() && target.IsValidTarget(E.Range))
-                        {
-                            Utility.DelayAction.Add(Edelay4, () => E.CastOnUnit(target));
-                        }
-
-                        if (W.IsReady() && target.IsValidTarget(W.Range))
-                        {
-                            Utility.DelayAction.Add(Wdelay4, () => W.Cast(target));
-                        }
-
-                        if (Q.IsReady() && target.IsValidTarget(Q.Range))
-                        {
-                            Utility.DelayAction.Add(Qdelay4, () => Q.Cast(target));
-                        }
+                        if (target.HasBuff("brandablaze"))
+                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        else
+                            Q.CastIfHitchanceEquals(target, HitChance.High);
                     }
-                    break;
+
+                    if (useE && E.IsReady() && target.IsValidTarget(E.Range))
+                    {
+                        if (!Q.IsReady())
+                            CastE(target);
+                        else
+                            CastE(target);
+                    }
+
+                    if (useR && R.IsReady() && target.IsValidTarget(R.Range))
+                    {
+                        if (!E.IsReady())
+                            Utility.DelayAction.Add(1600, () => CastR(target));
+                        else
+                            Utility.DelayAction.Add(1600, () => CastR(target));
+                    }
+
+                    if (useIgnite && Ignite.IsReady() && !R.IsReady())
+                        player.Spellbook.CastSpell(Ignite, target);
+                }
             }
+
+            
         }
         static void Harass()
         {
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+            var manaHarass = menu.Item("ManaManager.Harass").GetValue<bool>();
+            var manapercent = menu.Item("ManaManager.Value").GetValue<Slider>().Value;
+            if (manaHarass && ((int)player.ManaPercent) < manapercent)
+                return;
+
+            var useQ = menu.Item("Harass.UseQ").GetValue<bool>();
+            var useW = menu.Item("Harass.UseW").GetValue<bool>();
+            var useE = menu.Item("Harass.UseE").GetValue<bool>();
+            var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+
+            if (target != null)
             {
-                var mode = menu.Item("Harass.Mode").GetValue<StringList>().SelectedIndex;
-                var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
-
-                var Qdelay1 = menu.Item("Harass.Mode1Delay.Q").GetValue<Slider>().Value;
-                var Wdelay1 = menu.Item("Harass.Mode1Delay.W").GetValue<Slider>().Value;
-
-                var Edelay2 = menu.Item("Harass.Mode2Delay.E").GetValue<Slider>().Value;
-                var Qdelay2 = menu.Item("Harass.Mode2Delay.Q").GetValue<Slider>().Value;
-
-                var Edelay3 = menu.Item("Harass.Mode3Delay.E").GetValue<Slider>().Value;
-                var Wdelay3 = menu.Item("Harass.Mode3Delay.W").GetValue<Slider>().Value;
-
-                var Qdelay4 = menu.Item("Harass.Mode4Delay.Q").GetValue<Slider>().Value;
-                var Wdelay4 = menu.Item("Harass.Mode4Delay.W").GetValue<Slider>().Value;
-                var Edelay4 = menu.Item("Harass.Mode4Delay.E").GetValue<Slider>().Value;
-
-                var Qdelay5 = menu.Item("Harass.Mode5Delay.Q").GetValue<Slider>().Value;
-                var Wdelay5 = menu.Item("Harass.Mode5Delay.W").GetValue<Slider>().Value;
-                var Edelay5 = menu.Item("Harass.Mode5Delay.E").GetValue<Slider>().Value;
-
-                switch (mode)
+                if (player.Distance(target.Position) < E.Range)
                 {
-                    case 0:
-                        {
-                            if (W.IsReady() && target.IsValidTarget(W.Range))
-                            {
-                                Utility.DelayAction.Add(Wdelay1, () => W.Cast(target));
-                            }
+                    if (useE && E.IsReady() && target.IsValidTarget(E.Range))
+                        CastE(target);
 
-                            if (Q.IsReady() && target.IsValidTarget(Q.Range))
-                            {
-                                Utility.DelayAction.Add(Qdelay1, () => Q.Cast(target));                                
-                            }
-                        }
-                        break;
+                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    {
+                        if (target.HasBuff("brandablaze"))
+                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        else
+                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                    }
 
-                    case 1:
-                        {
-                            if (E.IsReady() && target.IsValidTarget(E.Range))
-                            {
-                                Utility.DelayAction.Add(Edelay2, () => E.CastOnUnit(target));
-                            }
+                    if (W.IsReady() && useW && target.IsValidTarget(W.Range))
+                    {
+                        if (!Q.IsReady())
+                            W.CastIfHitchanceEquals(target, HitChance.High);
+                        else
+                            W.CastIfHitchanceEquals(target, HitChance.High);
+                    }
+                }
 
-                            if (Q.IsReady() && target.IsValidTarget(Q.Range))
-                            {
-                                Utility.DelayAction.Add(Qdelay2, () => Q.Cast(target));                               
-                            }
-                        }
-                        break;
+                else
+                {
+                    if (W.IsReady() && useW && target.IsValidTarget(W.Range))
+                        W.CastIfHitchanceEquals(target, HitChance.High);
 
-                    case 2:
-                        {
-                            if (E.IsReady() && target.IsValidTarget(E.Range))
-                            {
-                                Utility.DelayAction.Add(Edelay3, () => E.CastOnUnit(target));
-                            }
+                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    {
+                        if (target.HasBuff("brandablaze"))
+                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        else
+                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                    }
 
-                            if (W.IsReady() && target.IsValidTarget(W.Range))
-                            {
-                                Utility.DelayAction.Add(Wdelay3, () => W.Cast(target));
-                            }
-                        }
-                        break;
+                    if (useE && E.IsReady() && target.IsValidTarget(E.Range))
+                    {
+                        if (!Q.IsReady())
+                            CastE(target);
+                        else
+                            CastE(target);
+                    }
+                        
+                }
+            }            
+        }
+        static void Farm()
+        {
+            var manaFarm = menu.Item("ManaManager.Farm").GetValue<bool>();
+            var manapercent = menu.Item("ManaManager.Value").GetValue<Slider>().Value;
+            if (manaFarm && ((int)player.ManaPercent) < manapercent)
+                return;
 
-                    case 3:
-                        {
-                            if (W.IsReady() && target.IsValidTarget(W.Range))
-                            {
-                                Utility.DelayAction.Add(Wdelay4, () => W.Cast(target));
-                            }
+            var useQ = menu.Item("Farm.Q").GetValue<bool>();
+            var useW = menu.Item("Farm.W").GetValue<bool>();
+            var useE = menu.Item("Farm.E").GetValue<bool>();
 
-                            if (Q.IsReady() && target.IsValidTarget(Q.Range))
-                            {
-                                Utility.DelayAction.Add(Qdelay4, () => Q.Cast(target));
-                            }
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(E.Range) && !m.IsDead && !m.IsInvulnerable))
+            {
+                var Qdmg = Q.GetDamage(minion) * 0.9;
+                var Wdmg = W.GetDamage(minion) * 0.9;
+                var Edmg = E.GetDamage(minion) * 0.9;
 
-                            if (E.IsReady() && target.IsValidTarget(E.Range))
-                            {
-                                Utility.DelayAction.Add(Edelay4, () => E.CastOnUnit(target));
-                            }
-                        }
-                        break;
+                if (Q.IsReady() && minion.Health < Qdmg && useQ)
+                {
+                    Q.Cast(minion);
+                }
 
-                    case 4:
-                        {
-                            if (E.IsReady() && target.IsValidTarget(E.Range))
-                            {
-                                Utility.DelayAction.Add(Edelay5, () => E.CastOnUnit(target));
-                            }
+                if (W.IsReady() && minion.Health < Wdmg && useW)
+                {
+                    W.Cast(minion);
+                }
 
-                            if (Q.IsReady() && target.IsValidTarget(Q.Range))
-                            {
-                                Utility.DelayAction.Add(Qdelay5, () => Q.Cast(target));                               
-                            }
-
-                            if (W.IsReady() && target.IsValidTarget(W.Range))
-                            {
-                                Utility.DelayAction.Add(Wdelay5, () => W.Cast(target));
-                            }
-                        }
-                        break;
+                if (E.IsReady() && minion.Health < Edmg && useE)
+                {
+                    E.CastOnUnit(minion);
                 }
             }
-            
+        }
+        static void LaneClean()
+        {
+            var manaLaneClean = menu.Item("ManaManager.LaneClean").GetValue<bool>();
+            var manapercent = menu.Item("ManaManager.Value").GetValue<Slider>().Value;
+            if (manaLaneClean && ((int)player.ManaPercent) < manapercent)
+                return;
+
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(E.Range) && !m.IsDead && !m.IsInvulnerable))
+            {
+                var useQ = menu.Item("LaneClean.Q").GetValue<bool>();
+                var useW = menu.Item("LaneClean.W").GetValue<bool>();
+                var useE = menu.Item("LaneClean.E").GetValue<bool>();
+
+                var Qdmg = Q.GetDamage(minion) * 0.9;
+                var Wdmg = W.GetDamage(minion) * 0.9;
+                var Edmg = E.GetDamage(minion) * 0.9;
+
+                if (Q.IsReady() && minion.Health < Qdmg && useQ)
+                {
+                    Q.Cast(minion);
+                }
+
+                if (W.IsReady() && minion.Health < Wdmg && useW)
+                {
+                    W.Cast(minion);
+                }
+
+                if (E.IsReady() && minion.Health < Edmg && useE)
+                {
+                    E.CastOnUnit(minion);
+                }
+            }
         }
         static void KillSteal()
         {
-            foreach(var target in ObjectManager.Get<Obj_AI_Hero>().Where(target=>target.IsValidTarget(E.Range) && !target.IsInvulnerable && target.IsEnemy))
+            var useQ = menu.Item("KillSteal.Q").GetValue<bool>();
+            var useW = menu.Item("KillSteal.W").GetValue<bool>();
+            var useE = menu.Item("KillSteal.E").GetValue<bool>();
+            var useIg = menu.Item("KillSteal.Ignite").GetValue<bool>();
+            
+            foreach (var target in ObjectManager.Get<Obj_AI_Hero>().Where(target => target.IsValidTarget(E.Range) && !target.IsInvulnerable && target.IsEnemy))
             {
-                var useQ = menu.Item("KillSteal.Q").GetValue<bool>();
-                var useW = menu.Item("KillSteal.W").GetValue<bool>();
-                var useE = menu.Item("KillSteal.E").GetValue<bool>();
-                var useIg = menu.Item("KillSteal.Ignite").GetValue<bool>();
-
                 var Qdmg = Q.GetDamage(target) * 0.9;
                 var Wdmg = W.GetDamage(target) * 0.9;
                 var Edmg = E.GetDamage(target) * 0.9;
                 float Ignitedmg;
                 if (Ignite != SpellSlot.Unknown)
-                    Ignitedmg = (float) player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+                    Ignitedmg = (float)player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
                 else
                     Ignitedmg = 0f;
 
@@ -479,10 +430,10 @@ namespace sBrand
                 {
                     player.Spellbook.CastSpell(Ignite, target);
                 }
-                                                
-                if (useQ && ! useW && !useE && Q.IsReady() && target.Health < Qdmg)
+
+                if (useQ && !useW && !useE && Q.IsReady() && target.Health < Qdmg)
                 {
-                    Q.Cast(target);                    
+                    Q.Cast(target);
                 }
 
                 if (!useQ && !useE && useW && W.IsReady() && target.Health < Wdmg)
@@ -492,67 +443,119 @@ namespace sBrand
 
                 if (!useQ && !useW && useE && E.IsReady() && target.Health < Edmg)
                 {
-                    E.CastOnUnit(target);
+                    CastE(target);
                 }
-            }                        
+            }
         }
-        static void Farm()
+        static float GetComboDamage(Obj_AI_Hero target)
         {
-            if(Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit)
+            var useQ = menu.Item("Combo.UseQ").GetValue<bool>();
+            var useW = menu.Item("Combo.UseW").GetValue<bool>();
+            var useE = menu.Item("Combo.UseE").GetValue<bool>();
+            var useR = menu.Item("Combo.UseR").GetValue<bool>();
+            double combodmg = 0;
+
+            if (Q.IsInRange(target) && useQ && Q.IsReady())
+                combodmg += Q.GetDamage(target);
+
+            if (W.IsInRange(target) && useW && W.IsReady())
+                combodmg += W.GetDamage(target);
+
+            if (E.IsInRange(target) && useE && E.IsReady())
+                combodmg += E.GetDamage(target);
+
+            if (R.IsInRange(target) && useR && R.IsReady())
+                combodmg += R.GetDamage(target);
+
+            return (float)combodmg;
+        }
+        static void Combat()
+        {
+            player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            var mode = menu.Item("CombatMode.Mode").GetValue<StringList>().SelectedIndex;
+            var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+
+            if (target != null)
             {
-                var useQ = menu.Item("Farm.Q").GetValue<bool>();
-                var useW = menu.Item("Farm.W").GetValue<bool>();
-                var useE = menu.Item("Farm.E").GetValue<bool>();
-
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(E.Range) && !m.IsDead && !m.IsInvulnerable))
+                switch (mode)
                 {
-                    var Qdmg = Q.GetDamage(minion) * 0.9;
-                    var Wdmg = W.GetDamage(minion) * 0.9;
-                    var Edmg = E.GetDamage(minion) * 0.9;
+                    case 0:
+                        {
+                            if (Q.IsReady() && target.IsValidTarget(Q.Range))
+                                Q.CastIfHitchanceEquals(target, HitChance.High);
 
-                    if (Q.IsReady() && minion.Health < Qdmg && useQ)
-                    {
-                        Q.Cast(minion);
-                    }
+                            if (E.IsReady() && target.HasBuff("brandablaze") && target.IsValidTarget(E.Range) && !Q.IsReady())
+                                E.CastOnUnit(target);
 
-                    if (W.IsReady() && minion.Health < Wdmg && useW)
-                    {
-                        W.Cast(minion);
-                    }
+                            if (W.IsReady() && target.IsValidTarget(W.Range) && target.HasBuff("brandablaze") && !E.IsReady())
+                                W.CastIfHitchanceEquals(target, HitChance.High);
 
-                    if (E.IsReady() && minion.Health < Edmg && useE)
-                    {
-                        E.CastOnUnit(minion);
-                    }                   
+                            if (R.IsReady() && target.IsValidTarget(R.Range) && target.HasBuff("brandablaze") && !W.IsReady())
+                                R.Cast(target);
+                        }
+                        break;
+
+                    case 1:
+                        {
+                            if (R.IsReady() && target.IsValidTarget(R.Range))
+                                R.Cast(target);
+
+                            if (E.IsReady() && target.HasBuff("brandablaze") && target.IsValidTarget(E.Range) && !R.IsReady())
+                                E.CastOnUnit(target);
+
+                            if (W.IsReady() && target.IsValidTarget(W.Range) && target.HasBuff("brandablaze") && !E.IsReady())
+                                W.CastIfHitchanceEquals(target, HitChance.High);
+
+                            if (Q.IsReady() && target.IsValidTarget(Q.Range) && target.HasBuff("brandablaze") && !W.IsReady())
+                                Q.CastIfHitchanceEquals(target, HitChance.High);
+                        }
+                        break;
                 }
             }            
         }
-        static void LaneClean()
+        
+        static void CastE(Obj_AI_Hero target)
         {
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear)
-            {                
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(E.Range) && !m.IsDead && !m.IsInvulnerable))
+            if (E.IsInRange(target))
+                E.CastOnUnit(target);
+            else
+            { 
+                foreach (var forcus in HeroManager.Enemies)
                 {
-                    var Qdmg = Q.GetDamage(minion) * 0.9;
-                    var Wdmg = W.GetDamage(minion) * 0.9;
-                    var Edmg = E.GetDamage(minion) * 0.9;
-
-                    if (Q.IsReady() && minion.Health < Qdmg)
+                    if (forcus.HasBuff("brandablaze") && forcus.IsValidTarget(E.Range) && forcus.Distance(target.Position) <= 500)                    
+                        E.CastOnUnit(forcus);
+                    else
                     {
-                        Q.Cast(minion);
+                        foreach (var minion in MinionManager.GetMinions(E.Range))
+                        {
+                            if (minion.HasBuff("brandablaze") && minion.IsValidTarget(E.Range) && minion.Distance(target.Position) <= 500)                            
+                                E.CastOnUnit(minion);                            
+                        }
                     }
-
-                    if (W.IsReady() && minion.Health < Wdmg)
+                }
+            }               
+        }
+        static void CastR(Obj_AI_Hero target)
+        {
+            if (R.IsInRange(target))
+                R.CastOnUnit(target);
+            else
+            {
+                foreach (var forcus in HeroManager.Enemies)
+                {
+                    if (forcus.HasBuff("brandablaze") && forcus.IsValidTarget(R.Range) && forcus.Distance(target.Position) <= 500)
+                        R.CastOnUnit(forcus);
+                    else
                     {
-                        W.Cast(minion);
-                    }
-
-                    if (E.IsReady() && minion.Health < Edmg)
-                    {
-                        E.CastOnUnit(minion);
+                        foreach (var minion in MinionManager.GetMinions(R.Range))
+                        {
+                            if (minion.HasBuff("brandablaze") && minion.IsValidTarget(R.Range) && minion.Distance(target.Position) <= 500)
+                                R.CastOnUnit(minion);
+                        }
                     }
                 }
             }
         }
+        
     }
 }
