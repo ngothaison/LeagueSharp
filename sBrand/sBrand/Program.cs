@@ -523,16 +523,14 @@ namespace sBrand
                 foreach (var forcus in HeroManager.Enemies)
                 {
                     if (forcus.HasBuff("brandablaze") && forcus.IsValidTarget(E.Range) && forcus.Distance(target.Position) <= 500)                    
-                        E.CastOnUnit(forcus);
-                    else
-                    {
-                        foreach (var minion in MinionManager.GetMinions(E.Range))
-                        {
-                            if (minion.HasBuff("brandablaze") && minion.IsValidTarget(E.Range) && minion.Distance(target.Position) <= 500)                            
-                                E.CastOnUnit(minion);                            
-                        }
-                    }
+                        E.CastOnUnit(forcus);                                                         
                 }
+
+                foreach (var minion in MinionManager.GetMinions(E.Range))
+                {
+                    if (minion.HasBuff("brandablaze") && minion.IsValidTarget(E.Range) && minion.Distance(target.Position) <= 500)
+                        E.CastOnUnit(minion);
+                }   
             }               
         }
         static void CastR(Obj_AI_Hero target)
@@ -544,15 +542,13 @@ namespace sBrand
                 foreach (var forcus in HeroManager.Enemies)
                 {
                     if (forcus.HasBuff("brandablaze") && forcus.IsValidTarget(R.Range) && forcus.Distance(target.Position) <= 500)
-                        R.CastOnUnit(forcus);
-                    else
-                    {
-                        foreach (var minion in MinionManager.GetMinions(R.Range))
-                        {
-                            if (minion.HasBuff("brandablaze") && minion.IsValidTarget(R.Range) && minion.Distance(target.Position) <= 500)
-                                R.CastOnUnit(minion);
-                        }
-                    }
+                        R.CastOnUnit(forcus);                    
+                }
+
+                foreach (var minion in MinionManager.GetMinions(R.Range))
+                {
+                    if (minion.HasBuff("brandablaze") && minion.IsValidTarget(R.Range) && minion.Distance(target.Position) <= 500)
+                        R.CastOnUnit(minion);
                 }
             }
         }
