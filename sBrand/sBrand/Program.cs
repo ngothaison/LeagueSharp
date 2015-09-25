@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
+using SPrediction;
 
 using Color = System.Drawing.Color;
 
@@ -39,6 +40,8 @@ namespace sBrand
             Ignite = player.GetSpellSlot("summonerdot");
 
             menu = new Menu("sBrand", "sBrand", true);
+
+            SPrediction.Prediction.Initialize(menu);
             //Orbwalker
             menu.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
             Orbwalker = new Orbwalking.Orbwalker(menu.SubMenu("Orbwalker"));
@@ -49,6 +52,7 @@ namespace sBrand
             //Combo Menu
             menu.AddSubMenu(new Menu("Combo", "Combo"));
             menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseQ", "Use Q").SetValue(true));
+           // menu.SubMenu("Combo").AddItem(new MenuItem("Combo.QOrdinal", "Use Q after W, E").SetValue(false));
             menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseW", "Use W").SetValue(true));
             menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseE", "Use E").SetValue(true));
             menu.SubMenu("Combo").AddItem(new MenuItem("Combo.UseR", "Use R").SetValue(true));
@@ -56,8 +60,13 @@ namespace sBrand
             //Harass Menu
             menu.AddSubMenu(new Menu("Harass", "Harass"));
             menu.SubMenu("Harass").AddItem(new MenuItem("Harass.UseQ", "Use Q").SetValue(true));
+            //menu.SubMenu("Harass").AddItem(new MenuItem("Harass.QOrdinal", "Use Q after W, E").SetValue(false));
             menu.SubMenu("Harass").AddItem(new MenuItem("Harass.UseW", "Use W").SetValue(true));
             menu.SubMenu("Harass").AddItem(new MenuItem("Harass.UseE", "Use E").SetValue(true));
+            //Hit chance
+            menu.AddSubMenu(new Menu("Hit Chance settings", "HitChance"));
+            menu.SubMenu("HitChance").AddItem(new MenuItem("HitChance.Q", "Q Hit chance").SetValue(new Slider(3, 1, 4)));
+            menu.SubMenu("HitChance").AddItem(new MenuItem("HitChance.W", "E Hit chance").SetValue(new Slider(3, 1, 4)));
             //Combat Modes.Thanks YLiCiOUS !
             menu.AddSubMenu(new Menu("Combat Modes", "CombatMode"));
             menu.SubMenu("CombatMode").AddItem(new MenuItem("CombatMode.Mode", "Mode").SetValue(new StringList(new[] { "Q+E+W+R", "R+E+W+Q" })));
@@ -126,8 +135,8 @@ namespace sBrand
             Drawing.OnDraw += Drawing_OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
-            Game.OnUpdate += Game_OnUpdate;            
-        }        
+            Game.OnUpdate += Game_OnUpdate;
+        }
         static void Game_OnUpdate(EventArgs args)
         {
             switch (Orbwalker.ActiveMode)
@@ -155,8 +164,8 @@ namespace sBrand
             {
                 if (E.IsReady() && E.IsInRange(sender))
                     E.CastOnUnit(sender);
-                if (Q.IsReady() && Q.IsInRange(sender) && sender.HasBuff("brandablaze"))                
-                    Q.CastIfHitchanceEquals(sender, HitChance.High);                
+                if (Q.IsReady() && Q.IsInRange(sender) && sender.HasBuff("brandablaze"))
+                    Q.CastIfHitchanceEquals(sender, HitChance.High);
             }
         }
 
@@ -167,47 +176,50 @@ namespace sBrand
 
             var enable = menu.Item("GapCloser.Enable").GetValue<bool>();
             if (enable)
-            {                
+            {
                 if (E.IsReady() && E.IsInRange(gapcloser.Sender))
                     E.CastOnUnit(gapcloser.Sender);
                 if (Q.IsReady() && Q.IsInRange(gapcloser.Sender) && gapcloser.Sender.HasBuff("brandablaze"))
                     Q.CastIfHitchanceEquals(gapcloser.Sender, HitChance.High);
-                
+
             }
         }
 
         static void Drawing_OnDraw(EventArgs args)
         {
-             var drawQ = menu.Item("Drawing.Q").GetValue<bool>();
-                var drawW = menu.Item("Drawing.W").GetValue<bool>();
-                var drawE = menu.Item("Drawing.E").GetValue<bool>();
-                var drawR = menu.Item("Drawing.R").GetValue<bool>();
+            var drawQ = menu.Item("Drawing.Q").GetValue<bool>();
+            var drawW = menu.Item("Drawing.W").GetValue<bool>();
+            var drawE = menu.Item("Drawing.E").GetValue<bool>();
+            var drawR = menu.Item("Drawing.R").GetValue<bool>();
 
-                if (drawQ)
-                    Drawing.DrawCircle(player.Position, Q.Range, System.Drawing.Color.Blue);
+            if (drawQ)
+                Drawing.DrawCircle(player.Position, Q.Range, System.Drawing.Color.Blue);
 
-                if (drawW)
-                    Drawing.DrawCircle(player.Position, W.Range, System.Drawing.Color.Green);
+            if (drawW)
+                Drawing.DrawCircle(player.Position, W.Range, System.Drawing.Color.Green);
 
-                if (drawE)
-                    Drawing.DrawCircle(player.Position, E.Range, System.Drawing.Color.BlueViolet);
+            if (drawE)
+                Drawing.DrawCircle(player.Position, E.Range, System.Drawing.Color.BlueViolet);
 
-                if (drawR)
-                    Drawing.DrawCircle(player.Position, R.Range, System.Drawing.Color.Red);   
+            if (drawR)
+                Drawing.DrawCircle(player.Position, R.Range, System.Drawing.Color.Red);
         }
-        
-        
+
+
         static void Combo()
         {
             var manaCombo = menu.Item("ManaManager.Combo").GetValue<bool>();
             var manapercent = menu.Item("ManaManager.Value").GetValue<Slider>().Value;
-            if (manaCombo && ((int) player.ManaPercent) < manapercent)
+            if (manaCombo && ((int)player.ManaPercent) < manapercent)
                 return;
 
             var useQ = menu.Item("Combo.UseQ").GetValue<bool>();
             var useW = menu.Item("Combo.UseW").GetValue<bool>();
             var useE = menu.Item("Combo.UseE").GetValue<bool>();
             var useR = menu.Item("Combo.UseR").GetValue<bool>();
+            var QOrdinal = menu.Item("Combo.QOrdinal").GetValue<bool>();
+            var Qhitchance = menu.Item("HitChance.Q").GetValue<Slider>().Value;
+            var Whitchance = menu.Item("HitChance.W").GetValue<Slider>().Value;
             var useIgnite = menu.Item("Combo.UseIgnite").GetValue<bool>();
             var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
 
@@ -218,28 +230,73 @@ namespace sBrand
                     if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                         CastE(target);
 
-                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    if (!QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
                         if (target.HasBuff("brandablaze"))
-                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                         else
-                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                     }
 
                     if (W.IsReady() && useW && target.IsValidTarget(W.Range))
                     {
-                        if (!Q.IsReady())
-                            W.CastIfHitchanceEquals(target, HitChance.High);
+                        if (Whitchance == 1)
+                            W.SPredictionCast(target, HitChance.Low);
+                        if (Whitchance == 2)
+                            W.SPredictionCast(target, HitChance.Medium);
+                        if (Whitchance == 3)
+                            W.SPredictionCast(target, HitChance.High);
+                        if (Whitchance == 4)
+                            W.SPredictionCast(target, HitChance.VeryHigh);
+                    }
+
+                    if (QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    {
+                        if (target.HasBuff("brandablaze"))
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                         else
-                            W.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                     }
 
                     if (useR && R.IsReady() && target.IsValidTarget(R.Range))
                     {
-                        if (!W.IsReady())
-                            Utility.DelayAction.Add(1600, () => CastR(target));
-                        else
-                            Utility.DelayAction.Add(1600, () => CastR(target));
+                        Utility.DelayAction.Add(1600, () => CastR(target));
                     }
 
                     if (useIgnite && Ignite.IsReady() && !R.IsReady())
@@ -249,14 +306,41 @@ namespace sBrand
                 else
                 {
                     if (W.IsReady() && useW && target.IsValidTarget(W.Range))
-                        W.CastIfHitchanceEquals(target, HitChance.High);
+                    {
+                        if (Whitchance == 1)
+                            W.SPredictionCast(target, HitChance.Low);
+                        if (Whitchance == 2)
+                            W.SPredictionCast(target, HitChance.Medium);
+                        if (Whitchance == 3)
+                            W.SPredictionCast(target, HitChance.High);
+                        if (Whitchance == 4)
+                            W.SPredictionCast(target, HitChance.VeryHigh);
+                    }
 
-                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    if (!QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
                         if (target.HasBuff("brandablaze"))
-                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                         else
-                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                     }
 
                     if (useE && E.IsReady() && target.IsValidTarget(E.Range))
@@ -265,6 +349,32 @@ namespace sBrand
                             CastE(target);
                         else
                             CastE(target);
+                    }
+
+                    if (QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    {
+                        if (target.HasBuff("brandablaze"))
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
+                        else
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                     }
 
                     if (useR && R.IsReady() && target.IsValidTarget(R.Range))
@@ -280,7 +390,7 @@ namespace sBrand
                 }
             }
 
-            
+
         }
         static void Harass()
         {
@@ -292,6 +402,9 @@ namespace sBrand
             var useQ = menu.Item("Harass.UseQ").GetValue<bool>();
             var useW = menu.Item("Harass.UseW").GetValue<bool>();
             var useE = menu.Item("Harass.UseE").GetValue<bool>();
+            var QOrdinal = menu.Item("Harass.QOrdinal").GetValue<bool>();
+            var Qhitchance = menu.Item("HitChance.Q").GetValue<Slider>().Value;
+            var Whitchance = menu.Item("HitChance.W").GetValue<Slider>().Value;
             var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
 
             if (target != null)
@@ -301,34 +414,109 @@ namespace sBrand
                     if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                         CastE(target);
 
-                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    if (!QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
                         if (target.HasBuff("brandablaze"))
-                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                         else
-                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                     }
 
                     if (W.IsReady() && useW && target.IsValidTarget(W.Range))
                     {
-                        if (!Q.IsReady())
-                            W.CastIfHitchanceEquals(target, HitChance.High);
+                        if (Whitchance == 1)
+                            W.SPredictionCast(target, HitChance.Low);
+                        if (Whitchance == 2)
+                            W.SPredictionCast(target, HitChance.Medium);
+                        if (Whitchance == 3)
+                            W.SPredictionCast(target, HitChance.High);
+                        if (Whitchance == 4)
+                            W.SPredictionCast(target, HitChance.VeryHigh);
+                    }
+
+                    if (QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    {
+                        if (target.HasBuff("brandablaze"))
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                         else
-                            W.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                     }
                 }
 
                 else
                 {
                     if (W.IsReady() && useW && target.IsValidTarget(W.Range))
-                        W.CastIfHitchanceEquals(target, HitChance.High);
+                    {
+                        if (Whitchance == 1)
+                            W.SPredictionCast(target, HitChance.Low);
+                        if (Whitchance == 2)
+                            W.SPredictionCast(target, HitChance.Medium);
+                        if (Whitchance == 3)
+                            W.SPredictionCast(target, HitChance.High);
+                        if (Whitchance == 4)
+                            W.SPredictionCast(target, HitChance.VeryHigh);
+                    }
 
-                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    if (!QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
                         if (target.HasBuff("brandablaze"))
-                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                         else
-                            Q.CastIfHitchanceEquals(target, HitChance.High);
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
                     }
 
                     if (useE && E.IsReady() && target.IsValidTarget(E.Range))
@@ -338,9 +526,34 @@ namespace sBrand
                         else
                             CastE(target);
                     }
-                        
+
+                    if (QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    {
+                        if (target.HasBuff("brandablaze"))
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
+                        else
+                        {
+                            if (Qhitchance == 1)
+                                Q.SPredictionCast(target, HitChance.Low);
+                            if (Qhitchance == 2)
+                                Q.SPredictionCast(target, HitChance.Medium);
+                            if (Qhitchance == 3)
+                                Q.SPredictionCast(target, HitChance.High);
+                            if (Qhitchance == 4)
+                                Q.SPredictionCast(target, HitChance.VeryHigh);
+                        }
+                    }
                 }
-            }            
+            }
         }
         static void Farm()
         {
@@ -352,26 +565,30 @@ namespace sBrand
             var useQ = menu.Item("Farm.Q").GetValue<bool>();
             var useW = menu.Item("Farm.W").GetValue<bool>();
             var useE = menu.Item("Farm.E").GetValue<bool>();
+            var minions = MinionManager.GetMinions(E.Range);
 
-            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(E.Range) && !m.IsDead && !m.IsInvulnerable))
+            foreach (var minion in minions)
             {
                 var Qdmg = Q.GetDamage(minion) * 0.9;
                 var Wdmg = W.GetDamage(minion) * 0.9;
                 var Edmg = E.GetDamage(minion) * 0.9;
 
-                if (Q.IsReady() && minion.Health < Qdmg && useQ)
+
+                if (E.IsReady() && minion.Health < Edmg && useE)
                 {
-                    Q.Cast(minion);
+                    E.CastOnUnit(minion);
                 }
+
 
                 if (W.IsReady() && minion.Health < Wdmg && useW)
                 {
                     W.Cast(minion);
                 }
 
-                if (E.IsReady() && minion.Health < Edmg && useE)
+
+                if (Q.IsReady() && minion.Health < Qdmg && useQ)
                 {
-                    E.CastOnUnit(minion);
+                    Q.Cast(minion);
                 }
             }
         }
@@ -414,7 +631,7 @@ namespace sBrand
             var useW = menu.Item("KillSteal.W").GetValue<bool>();
             var useE = menu.Item("KillSteal.E").GetValue<bool>();
             var useIg = menu.Item("KillSteal.Ignite").GetValue<bool>();
-            
+
             foreach (var target in ObjectManager.Get<Obj_AI_Hero>().Where(target => target.IsValidTarget(E.Range) && !target.IsInvulnerable && target.IsEnemy))
             {
                 var Qdmg = Q.GetDamage(target) * 0.9;
@@ -474,6 +691,8 @@ namespace sBrand
             player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
             var mode = menu.Item("CombatMode.Mode").GetValue<StringList>().SelectedIndex;
             var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+            var Qhitchance = menu.Item("HitChance.Q").GetValue<Slider>().Value;
+            var Whitchance = menu.Item("HitChance.W").GetValue<Slider>().Value;
 
             if (target != null)
             {
@@ -482,13 +701,45 @@ namespace sBrand
                     case 0:
                         {
                             if (Q.IsReady() && target.IsValidTarget(Q.Range))
-                                Q.CastIfHitchanceEquals(target, HitChance.High);
+                            {
+                                if (target.HasBuff("brandablaze"))
+                                {
+                                    if (Qhitchance == 1)
+                                        Q.SPredictionCast(target, HitChance.Low);
+                                    if (Qhitchance == 2)
+                                        Q.SPredictionCast(target, HitChance.Medium);
+                                    if (Qhitchance == 3)
+                                        Q.SPredictionCast(target, HitChance.High);
+                                    if (Qhitchance == 4)
+                                        Q.SPredictionCast(target, HitChance.VeryHigh);
+                                }
+                                else
+                                {
+                                    if (Qhitchance == 1)
+                                        Q.SPredictionCast(target, HitChance.Low);
+                                    if (Qhitchance == 2)
+                                        Q.SPredictionCast(target, HitChance.Medium);
+                                    if (Qhitchance == 3)
+                                        Q.SPredictionCast(target, HitChance.High);
+                                    if (Qhitchance == 4)
+                                        Q.SPredictionCast(target, HitChance.VeryHigh);
+                                }
+                            }
 
                             if (E.IsReady() && target.HasBuff("brandablaze") && target.IsValidTarget(E.Range) && !Q.IsReady())
                                 E.CastOnUnit(target);
 
                             if (W.IsReady() && target.IsValidTarget(W.Range) && target.HasBuff("brandablaze") && !E.IsReady())
-                                W.CastIfHitchanceEquals(target, HitChance.High);
+                            {
+                                if (Whitchance == 1)
+                                    W.SPredictionCast(target, HitChance.Low);
+                                if (Whitchance == 2)
+                                    W.SPredictionCast(target, HitChance.Medium);
+                                if (Whitchance == 3)
+                                    W.SPredictionCast(target, HitChance.High);
+                                if (Whitchance == 4)
+                                    W.SPredictionCast(target, HitChance.VeryHigh);
+                            }
 
                             if (R.IsReady() && target.IsValidTarget(R.Range) && target.HasBuff("brandablaze") && !W.IsReady())
                                 R.Cast(target);
@@ -504,34 +755,66 @@ namespace sBrand
                                 E.CastOnUnit(target);
 
                             if (W.IsReady() && target.IsValidTarget(W.Range) && target.HasBuff("brandablaze") && !E.IsReady())
-                                W.CastIfHitchanceEquals(target, HitChance.High);
+                            {
+                                if (Whitchance == 1)
+                                    W.SPredictionCast(target, HitChance.Low);
+                                if (Whitchance == 2)
+                                    W.SPredictionCast(target, HitChance.Medium);
+                                if (Whitchance == 3)
+                                    W.SPredictionCast(target, HitChance.High);
+                                if (Whitchance == 4)
+                                    W.SPredictionCast(target, HitChance.VeryHigh);
+                            }
 
                             if (Q.IsReady() && target.IsValidTarget(Q.Range) && target.HasBuff("brandablaze") && !W.IsReady())
-                                Q.CastIfHitchanceEquals(target, HitChance.High);
+                            {
+                                if (target.HasBuff("brandablaze"))
+                                {
+                                    if (Qhitchance == 1)
+                                        Q.SPredictionCast(target, HitChance.Low);
+                                    if (Qhitchance == 2)
+                                        Q.SPredictionCast(target, HitChance.Medium);
+                                    if (Qhitchance == 3)
+                                        Q.SPredictionCast(target, HitChance.High);
+                                    if (Qhitchance == 4)
+                                        Q.SPredictionCast(target, HitChance.VeryHigh);
+                                }
+                                else
+                                {
+                                    if (Qhitchance == 1)
+                                        Q.SPredictionCast(target, HitChance.Low);
+                                    if (Qhitchance == 2)
+                                        Q.SPredictionCast(target, HitChance.Medium);
+                                    if (Qhitchance == 3)
+                                        Q.SPredictionCast(target, HitChance.High);
+                                    if (Qhitchance == 4)
+                                        Q.SPredictionCast(target, HitChance.VeryHigh);
+                                }
+                            }
                         }
                         break;
                 }
-            }            
+            }
         }
-        
+
         static void CastE(Obj_AI_Hero target)
         {
             if (E.IsInRange(target))
                 E.CastOnUnit(target);
             else
-            { 
+            {
                 foreach (var forcus in HeroManager.Enemies)
                 {
-                    if (forcus.HasBuff("brandablaze") && forcus.IsValidTarget(E.Range) && forcus.Distance(target.Position) <= 500)                    
-                        E.CastOnUnit(forcus);                                                         
+                    if (forcus.HasBuff("brandablaze") && forcus.IsValidTarget(E.Range) && forcus.Distance(target.Position) <= 500)
+                        E.CastOnUnit(forcus);
                 }
 
                 foreach (var minion in MinionManager.GetMinions(E.Range))
                 {
                     if (minion.HasBuff("brandablaze") && minion.IsValidTarget(E.Range) && minion.Distance(target.Position) <= 500)
                         E.CastOnUnit(minion);
-                }   
-            }               
+                }
+            }
         }
         static void CastR(Obj_AI_Hero target)
         {
@@ -542,7 +825,7 @@ namespace sBrand
                 foreach (var forcus in HeroManager.Enemies)
                 {
                     if (forcus.HasBuff("brandablaze") && forcus.IsValidTarget(R.Range) && forcus.Distance(target.Position) <= 500)
-                        R.CastOnUnit(forcus);                    
+                        R.CastOnUnit(forcus);
                 }
 
                 foreach (var minion in MinionManager.GetMinions(R.Range))
@@ -552,6 +835,6 @@ namespace sBrand
                 }
             }
         }
-        
+
     }
 }
