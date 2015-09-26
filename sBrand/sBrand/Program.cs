@@ -217,7 +217,7 @@ namespace sBrand
             var useW = menu.Item("Combo.UseW").GetValue<bool>();
             var useE = menu.Item("Combo.UseE").GetValue<bool>();
             var useR = menu.Item("Combo.UseR").GetValue<bool>();
-            var QOrdinal = menu.Item("Combo.QOrdinal").GetValue<bool>();
+            //var QOrdinal = menu.Item("Combo.QOrdinal").GetValue<bool>();
             var Qhitchance = menu.Item("HitChance.Q").GetValue<Slider>().Value;
             var Whitchance = menu.Item("HitChance.W").GetValue<Slider>().Value;
             var useIgnite = menu.Item("Combo.UseIgnite").GetValue<bool>();
@@ -230,7 +230,7 @@ namespace sBrand
                     if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                         CastE(target);
 
-                    if (!QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
                         if (target.HasBuff("brandablaze"))
                         {
@@ -268,31 +268,7 @@ namespace sBrand
                             W.SPredictionCast(target, HitChance.VeryHigh);
                     }
 
-                    if (QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
-                    {
-                        if (target.HasBuff("brandablaze"))
-                        {
-                            if (Qhitchance == 1)
-                                Q.SPredictionCast(target, HitChance.Low);
-                            if (Qhitchance == 2)
-                                Q.SPredictionCast(target, HitChance.Medium);
-                            if (Qhitchance == 3)
-                                Q.SPredictionCast(target, HitChance.High);
-                            if (Qhitchance == 4)
-                                Q.SPredictionCast(target, HitChance.VeryHigh);
-                        }
-                        else
-                        {
-                            if (Qhitchance == 1)
-                                Q.SPredictionCast(target, HitChance.Low);
-                            if (Qhitchance == 2)
-                                Q.SPredictionCast(target, HitChance.Medium);
-                            if (Qhitchance == 3)
-                                Q.SPredictionCast(target, HitChance.High);
-                            if (Qhitchance == 4)
-                                Q.SPredictionCast(target, HitChance.VeryHigh);
-                        }
-                    }
+                    
 
                     if (useR && R.IsReady() && target.IsValidTarget(R.Range))
                     {
@@ -317,7 +293,7 @@ namespace sBrand
                             W.SPredictionCast(target, HitChance.VeryHigh);
                     }
 
-                    if (!QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    if ( useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
                         if (target.HasBuff("brandablaze"))
                         {
@@ -351,31 +327,7 @@ namespace sBrand
                             CastE(target);
                     }
 
-                    if (QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
-                    {
-                        if (target.HasBuff("brandablaze"))
-                        {
-                            if (Qhitchance == 1)
-                                Q.SPredictionCast(target, HitChance.Low);
-                            if (Qhitchance == 2)
-                                Q.SPredictionCast(target, HitChance.Medium);
-                            if (Qhitchance == 3)
-                                Q.SPredictionCast(target, HitChance.High);
-                            if (Qhitchance == 4)
-                                Q.SPredictionCast(target, HitChance.VeryHigh);
-                        }
-                        else
-                        {
-                            if (Qhitchance == 1)
-                                Q.SPredictionCast(target, HitChance.Low);
-                            if (Qhitchance == 2)
-                                Q.SPredictionCast(target, HitChance.Medium);
-                            if (Qhitchance == 3)
-                                Q.SPredictionCast(target, HitChance.High);
-                            if (Qhitchance == 4)
-                                Q.SPredictionCast(target, HitChance.VeryHigh);
-                        }
-                    }
+                    
 
                     if (useR && R.IsReady() && target.IsValidTarget(R.Range))
                     {
@@ -402,7 +354,7 @@ namespace sBrand
             var useQ = menu.Item("Harass.UseQ").GetValue<bool>();
             var useW = menu.Item("Harass.UseW").GetValue<bool>();
             var useE = menu.Item("Harass.UseE").GetValue<bool>();
-            var QOrdinal = menu.Item("Harass.QOrdinal").GetValue<bool>();
+            //var QOrdinal = menu.Item("Harass.QOrdinal").GetValue<bool>();
             var Qhitchance = menu.Item("HitChance.Q").GetValue<Slider>().Value;
             var Whitchance = menu.Item("HitChance.W").GetValue<Slider>().Value;
             var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
@@ -414,7 +366,7 @@ namespace sBrand
                     if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                         CastE(target);
 
-                    if (!QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    if ( useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
                         if (target.HasBuff("brandablaze"))
                         {
@@ -452,31 +404,7 @@ namespace sBrand
                             W.SPredictionCast(target, HitChance.VeryHigh);
                     }
 
-                    if (QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
-                    {
-                        if (target.HasBuff("brandablaze"))
-                        {
-                            if (Qhitchance == 1)
-                                Q.SPredictionCast(target, HitChance.Low);
-                            if (Qhitchance == 2)
-                                Q.SPredictionCast(target, HitChance.Medium);
-                            if (Qhitchance == 3)
-                                Q.SPredictionCast(target, HitChance.High);
-                            if (Qhitchance == 4)
-                                Q.SPredictionCast(target, HitChance.VeryHigh);
-                        }
-                        else
-                        {
-                            if (Qhitchance == 1)
-                                Q.SPredictionCast(target, HitChance.Low);
-                            if (Qhitchance == 2)
-                                Q.SPredictionCast(target, HitChance.Medium);
-                            if (Qhitchance == 3)
-                                Q.SPredictionCast(target, HitChance.High);
-                            if (Qhitchance == 4)
-                                Q.SPredictionCast(target, HitChance.VeryHigh);
-                        }
-                    }
+                    
                 }
 
                 else
@@ -493,7 +421,7 @@ namespace sBrand
                             W.SPredictionCast(target, HitChance.VeryHigh);
                     }
 
-                    if (!QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                    if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                     {
                         if (target.HasBuff("brandablaze"))
                         {
@@ -527,31 +455,7 @@ namespace sBrand
                             CastE(target);
                     }
 
-                    if (QOrdinal && useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
-                    {
-                        if (target.HasBuff("brandablaze"))
-                        {
-                            if (Qhitchance == 1)
-                                Q.SPredictionCast(target, HitChance.Low);
-                            if (Qhitchance == 2)
-                                Q.SPredictionCast(target, HitChance.Medium);
-                            if (Qhitchance == 3)
-                                Q.SPredictionCast(target, HitChance.High);
-                            if (Qhitchance == 4)
-                                Q.SPredictionCast(target, HitChance.VeryHigh);
-                        }
-                        else
-                        {
-                            if (Qhitchance == 1)
-                                Q.SPredictionCast(target, HitChance.Low);
-                            if (Qhitchance == 2)
-                                Q.SPredictionCast(target, HitChance.Medium);
-                            if (Qhitchance == 3)
-                                Q.SPredictionCast(target, HitChance.High);
-                            if (Qhitchance == 4)
-                                Q.SPredictionCast(target, HitChance.VeryHigh);
-                        }
-                    }
+                    
                 }
             }
         }
