@@ -90,11 +90,15 @@ namespace sAIO.Champions
                 DrawDamage.Fill = eventArgs.GetNewValue<Circle>().Active;
                 DrawDamage.FillColor = eventArgs.GetNewValue<Circle>().Color;
             };
+            menu.AddToMainMenu();                    
 
             Game.OnUpdate += Game_OnUpdate;
             GameObject.OnCreate+=GameObject_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Hero.OnProcessSpellCast += Obj_AI_Hero_OnProcessSpellCast;
+
+            Game.PrintChat("sAIO: " + player.ChampionName + " loaded");
+
         }
 
         static void Obj_AI_Hero_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)

@@ -38,10 +38,6 @@ namespace sAIO
                 case "Katarina":
                     new Katarina();
                     break;
-                
-                case "Brand":
-                    new Brand();
-                    break;
 
                 case "Renekton":
                     new Renekton();
@@ -60,7 +56,6 @@ namespace sAIO
                     break;
             }
 
-            Game.PrintChat("sAIO: " + player.ChampionName + " loaded");
         }
 
     }

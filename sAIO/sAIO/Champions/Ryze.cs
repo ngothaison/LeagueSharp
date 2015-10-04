@@ -12,7 +12,7 @@ using Color = System.Drawing.Color;
 
 namespace sAIO.Champions
 {
-    internal class Ryze : Helper
+    public class Ryze : Helper
     {
         public Ryze()
         {
@@ -26,6 +26,7 @@ namespace sAIO.Champions
             R = new Spell(SpellSlot.R);
             Q.SetSkillshot(250f, Q.Instance.SData.LineWidth, Q.Instance.SData.MissileSpeed, true, SkillshotType.SkillshotLine);
 
+            SPrediction.Prediction.Initialize(menu);
             menu.AddSubMenu(new Menu("Combo", "Combo"));
             CreateMenuBool("Combo", "Combo.Q", "Use Q", true);
             CreateMenuBool("Combo", "Combo.W", "Use W", true);
@@ -34,7 +35,7 @@ namespace sAIO.Champions
 
             menu.AddSubMenu(new Menu("Harass", "Harass"));
             CreateMenuBool("Harass", "Harass.Q", "Use Q", true);
-            CreateMenuBool("Harass", "Harass.W", "Use E", true);
+            CreateMenuBool("Harass", "Harass.W", "Use W", true);
             CreateMenuBool("Harass", "Harass.E", "Use E", true);
             CreateMenuSlider("Harass", "Harass.MinManaPercent", "Min Mana Percent To Use", 0, 15, 100);
 
@@ -42,9 +43,9 @@ namespace sAIO.Champions
             CreateMenuBool("GC", "GC.W", "Use W", true);
 
             menu.AddSubMenu(new Menu("Kill Steal", "KS"));
-            CreateMenuBool("KC", "KS.Q", "Use Q", true);
-            CreateMenuBool("KC", "KS.W", "Use E", true);
-            CreateMenuBool("KC", "KS.E", "Use E", true);
+            CreateMenuBool("KS", "KS.Q", "Use Q", true);
+            CreateMenuBool("KS", "KS.W", "Use E", true);
+            CreateMenuBool("KS", "KS.E", "Use E", true);
 
             menu.AddSubMenu(new Menu("Farm", "Farm"));
             CreateMenuBool("Farm", "Farm.Q", "Use Q", true);
@@ -80,10 +81,14 @@ namespace sAIO.Champions
                 DrawDamage.Fill = eventArgs.GetNewValue<Circle>().Active;
                 DrawDamage.FillColor = eventArgs.GetNewValue<Circle>().Color;
             };
+            menu.AddToMainMenu();                    
 
             Game.OnUpdate += Game_OnUpdate;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
+
+            Game.PrintChat("sAIO: " + player.ChampionName + " loaded");
+
         }
 
         static void Drawing_OnDraw(EventArgs args)
@@ -128,11 +133,11 @@ namespace sAIO.Champions
         }
         static void Combo()
         {
-            var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
             if(target != null)
             {
-                if (player.Buffs.Count(b => b.Name == "RyzePassiveStack") <= 3)
+                if (player.Buffs.Count(b => b.Name == "RyzePassiveStack") < 4)
                 {
                     if (GetValueMenuBool("Combo.R") && R.IsReady())
                         R.Cast();
@@ -170,7 +175,7 @@ namespace sAIO.Champions
             if ((int)player.ManaPercent <= minManaToHarass)
                 return;
 
-            var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
             if (target != null)
             {

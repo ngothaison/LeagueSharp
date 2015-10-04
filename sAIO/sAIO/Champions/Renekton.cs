@@ -14,6 +14,7 @@ namespace sAIO.Champions
 {
     public class Renekton : Helper
     {
+        static bool didE;
         static int lastW; 
         public Renekton()
         {
@@ -24,10 +25,10 @@ namespace sAIO.Champions
         {
             
 
-            Q = new Spell(SpellSlot.Q, 450f);
+            Q = new Spell(SpellSlot.Q, 325f);
             W = new Spell(SpellSlot.W);
-            E = new Spell(SpellSlot.E, 550f);
-            E2 = new Spell(SpellSlot.E, 550f);
+            E = new Spell(SpellSlot.E, 450f);
+            E2 = new Spell(SpellSlot.E, 450f);
             R = new Spell(SpellSlot.R);
 
 
@@ -40,7 +41,7 @@ namespace sAIO.Champions
             CreateMenuBool("sRenekton.Combo", "Combo.Q", "Use Q", true);
             CreateMenuBool("sRenekton.Combo", "Combo.W", "Use W", true);
             CreateMenuBool("sRenekton.Combo", "Combo.E", "Use E", true);
-            CreateMenuBool("sRenekton.Combo", "Combo.R", "Use E", true);
+            CreateMenuBool("sRenekton.Combo", "Combo.R", "Use R", true);
 
             Menu harassMenu = new Menu("Harass", "sRenekton.Harass");
             menu.AddSubMenu(harassMenu);
@@ -71,6 +72,10 @@ namespace sAIO.Champions
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            
+
+            Game.PrintChat("sAIO: " + player.ChampionName + " loaded");
+
         }
 
         static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
@@ -151,6 +156,9 @@ namespace sAIO.Champions
         {
             if (sender.IsMe)
             {
+                if (args.SData.Name == E.Instance.SData.Name)
+                    didE = true;
+
                 if (args.SData.Name==W.Instance.SData.Name)
                 {
                     Utility.DelayAction.Add(260, Orbwalking.ResetAutoAttackTimer);
@@ -165,17 +173,19 @@ namespace sAIO.Champions
             var useR = GetValueMenuBool("Combo.R");
             var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
 
-            if (useR && R.IsReady())
-            {
-                R.Cast();
-            }
-
             if (E.IsReady() && target.IsValidTarget(E.Range) && useE)
             {
                 CastE(target);
             }
 
-            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW > (player.AttackCastDelay * 1000 + 10) && useQ)
+            if (useR && R.IsReady())
+            {
+                R.Cast();
+            }
+
+           
+
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW > 1000 && useQ)
             {
                 Q.Cast();
             }
@@ -196,7 +206,7 @@ namespace sAIO.Champions
                 CastE(target);
             }
 
-            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW > (player.AttackCastDelay * 1000 + 10) && useQ)
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW > 1000 && useQ)
             {
                 Q.Cast();
             }
@@ -266,16 +276,23 @@ namespace sAIO.Champions
         
         static void CastE(Obj_AI_Hero target)
         {
-            if (player.Distance(target.Position) <= E.Range && target != null)
+            
+
+            if (player.Distance(target.Position) <= E.Range && target != null && !didE)
+            {
                 E.Cast(target.Position);
+                
+            }              
 
             else
             {
                 var minion = MinionManager.GetMinions(E.Range).Where(m => m.Distance(target.Position) < E2.Range).FirstOrDefault();
 
-                if(minion != null)                
+                if(minion != null)
+                {
                     E.Cast(minion.Position);
-
+                }
+                   
                 if (player.HasBuff("renektonsliceanddicedelay"))
                     E2.Cast(target.Position);
             }

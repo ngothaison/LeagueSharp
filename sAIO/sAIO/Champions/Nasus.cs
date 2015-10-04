@@ -59,11 +59,15 @@ namespace sAIO.Champions
             menu.AddSubMenu(new Menu("Lane Clean", "LC"));
             CreateMenuBool("LC", "LC.Q", "Use Q", true);
             CreateMenuBool("LC", "LC.E", "Use E", true);
+            menu.AddToMainMenu();                    
 
             Game.OnUpdate += Game_OnUpdate;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             Drawing.OnDraw += Drawing_OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+
+            Game.PrintChat("sAIO: " + player.ChampionName + " loaded");
+
         }
 
         static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)

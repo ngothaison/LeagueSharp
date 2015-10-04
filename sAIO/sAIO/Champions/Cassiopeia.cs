@@ -13,7 +13,7 @@ using Color = System.Drawing.Color;
 
 namespace sAIO.Champions
 {
-    class Cassiopeia : Helper
+    public class Cassiopeia : Helper
     {
         private static int lastQ, lastE;
         public Cassiopeia()
@@ -30,6 +30,7 @@ namespace sAIO.Champions
             W.SetSkillshot(0.5f, 90f, 2500, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.3f, (float)(80 * Math.PI / 180), float.MaxValue, false, SkillshotType.SkillshotCone);
 
+            SPrediction.Prediction.Initialize(menu);
             menu.AddSubMenu(new Menu("Combo", "Combo"));
             CreateMenuBool("Combo", "Combo.Q", "Use Q", true);
             CreateMenuBool("Combo", "Combo.W", "Use W", true);
@@ -86,10 +87,29 @@ namespace sAIO.Champions
                 DrawDamage.Fill = eventArgs.GetNewValue<Circle>().Active;
                 DrawDamage.FillColor = eventArgs.GetNewValue<Circle>().Color;
             };
+            menu.AddToMainMenu();                    
+
 
             Game.OnUpdate += Game_OnUpdate;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
+            Obj_AI_Hero.OnProcessSpellCast += Obj_AI_Hero_OnProcessSpellCast;
+
+            Game.PrintChat("sAIO: " + player.ChampionName + " loaded");
+
+        }
+
+        static void Obj_AI_Hero_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (sender.IsMe)
+            {
+                if (args.SData.Name == E.Instance.SData.Name)
+                    lastE = Environment.TickCount;
+
+                if (args.SData.Name == Q.Instance.SData.Name)
+                    lastQ = Environment.TickCount;
+                
+            }
         }
 
         static void Drawing_OnDraw(EventArgs args)
@@ -142,7 +162,7 @@ namespace sAIO.Champions
                 if(Q.IsReady() && Q.IsInRange(target) && GetValueMenuBool("Combo.Q"))
                 {
                     Q.SPredictionCast(target, HitChance.High);
-                    lastQ = Environment.TickCount;
+                    
                 }
 
                 if (W.IsReady() && W.IsInRange(target) && GetValueMenuBool("Combo.W") && Environment.TickCount - lastQ > (Q.Delay * 1000))
@@ -155,15 +175,10 @@ namespace sAIO.Champions
                         if (Environment.TickCount - lastE > eDelay)
                         {
                             E.CastOnUnit(target);
-                            lastE = Environment.TickCount;
+                            
                         }
                     }
 
-                   else
-                    {
-                        E.CastOnUnit(target);
-                        lastE = Environment.TickCount;
-                    }
                 }
 
                 if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R"))
@@ -185,7 +200,7 @@ namespace sAIO.Champions
                 if (Q.IsReady() && Q.IsInRange(target) && GetValueMenuBool("Harass.Q"))
                 {
                     Q.SPredictionCast(target, HitChance.High);
-                    lastQ = Environment.TickCount;
+                   
                 }
 
                 if (W.IsReady() && W.IsInRange(target) && GetValueMenuBool("Harass.W") && Environment.TickCount - lastQ > (Q.Delay * 1000))
@@ -198,15 +213,15 @@ namespace sAIO.Champions
                         if (Environment.TickCount - lastE > eDelay)
                         {
                             E.CastOnUnit(target);
-                            lastE = Environment.TickCount;
+                            
                         }
                     }
 
-                    else
+                    /*else
                     {
                         E.CastOnUnit(target);
                         lastE = Environment.TickCount;
-                    }
+                    }*/
                 }
             }
         }

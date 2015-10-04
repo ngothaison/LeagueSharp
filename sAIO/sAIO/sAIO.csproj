@@ -58,19 +58,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="clipper_library">
-      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\clipper_library.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\clipper_library.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp">
-      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\LeagueSharp.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\LeagueSharp.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.Common">
-      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\LeagueSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\SharpDX.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SPrediction">
-      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\SPrediction.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\SPrediction.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -82,7 +82,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Champions\Brand.cs" />
+    <Compile Include="Champions\Blitzcrank.cs" />
     <Compile Include="Champions\Cassiopeia.cs" />
     <Compile Include="Champions\Darius.cs" />
     <Compile Include="Champions\Katarina.cs" />
@@ -90,9 +90,10 @@
     <Compile Include="Champions\Nasus.cs" />
     <Compile Include="Champions\Renekton.cs" />
     <Compile Include="Champions\Ryze.cs" />
+    <Compile Include="Champions\Syndra.cs" />
+    <Compile Include="Champions\Xerath.cs" />
     <Compile Include="Core\DrawDamage.cs" />
     <Compile Include="Core\Helper.cs" />
-    <Compile Include="Core\MenuLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
