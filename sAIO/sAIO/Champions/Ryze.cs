@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
-using SPrediction;
+
 using sAIO.Core;
 using Color = System.Drawing.Color;
 
@@ -26,7 +26,7 @@ namespace sAIO.Champions
             R = new Spell(SpellSlot.R);
             Q.SetSkillshot(250f, Q.Instance.SData.LineWidth, Q.Instance.SData.MissileSpeed, true, SkillshotType.SkillshotLine);
 
-            SPrediction.Prediction.Initialize(menu);
+            
             menu.AddSubMenu(new Menu("Combo", "Combo"));
             CreateMenuBool("Combo", "Combo.Q", "Use Q", true);
             CreateMenuBool("Combo", "Combo.W", "Use W", true);
@@ -146,7 +146,12 @@ namespace sAIO.Champions
                         E.CastOnUnit(target);
 
                     if (GetValueMenuBool("Combo.Q") && Q.IsReady() && Q.IsInRange(target))
-                        Q.SPredictionCast(target, HitChance.High);
+                    {
+                        var qHitChance = Q.GetPrediction(target);
+
+                        if (qHitChance.Hitchance >= HitChance.High && qHitChance.CollisionObjects.Count < 1)
+                            Q.Cast(target);
+                    }
 
                     if (GetValueMenuBool("Combo.W") && W.IsReady() && W.IsInRange(target))
                         W.CastOnUnit(target);
@@ -158,7 +163,12 @@ namespace sAIO.Champions
                         W.CastOnUnit(target);
 
                     if (GetValueMenuBool("Combo.Q") && Q.IsReady() && Q.IsInRange(target))
-                        Q.SPredictionCast(target, HitChance.High);
+                    {
+                        var qHitChance = Q.GetPrediction(target);
+
+                        if (qHitChance.Hitchance >= HitChance.High && qHitChance.CollisionObjects.Count < 1)
+                            Q.Cast(target);
+                    }
 
                     if (GetValueMenuBool("Combo.R") && R.IsReady())
                         R.Cast();
@@ -180,7 +190,12 @@ namespace sAIO.Champions
             if (target != null)
             {
                 if (GetValueMenuBool("Harass.Q") && Q.IsReady() && Q.IsInRange(target))
-                    Q.SPredictionCast(target, HitChance.High);
+                {
+                    var qHitChance = Q.GetPrediction(target);
+
+                    if (qHitChance.Hitchance >= HitChance.High && qHitChance.CollisionObjects.Count < 1)
+                        Q.Cast(target);
+                }
 
                 if (GetValueMenuBool("Harass.W") && W.IsReady() && W.IsInRange(target))
                     W.CastOnUnit(target);
@@ -296,7 +311,12 @@ namespace sAIO.Champions
                 var eDamage = E.GetDamage(enemy) * 0.9;
 
                 if (GetValueMenuBool("KS.Q") && Q.IsReady() && Q.IsInRange(enemy) && enemy.Health < qDamage)
-                    Q.SPredictionCast(enemy, HitChance.High);
+                {
+                    var qHitChance = Q.GetPrediction(enemy);
+
+                    if (qHitChance.Hitchance >= HitChance.High && qHitChance.CollisionObjects.Count < 1)
+                        Q.Cast(enemy);
+                }
 
                 if (GetValueMenuBool("KS.W") && W.IsReady() && W.IsInRange(enemy) && enemy.Health < wDamage)
                     W.CastOnUnit(enemy);

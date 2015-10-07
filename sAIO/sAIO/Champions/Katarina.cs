@@ -15,7 +15,7 @@ namespace sAIO.Champions
     {
         private static int _lastPlaced;
         private static Vector3 _lastWardPos;
-        static int lastE, lastQ;
+        static int lastE = 0, lastQ = 0;
 
         public Katarina()
         {
@@ -110,13 +110,28 @@ namespace sAIO.Champions
 
                 if (args.SData.Name == Q.Instance.SData.Name)
                     lastQ = Environment.TickCount;
+
+                if (player.IsChannelingImportantSpell() || player.HasBuff("KatarinaR") || player.HasBuff("katarinarsound",true))
+                {
+                    orbwalker.SetAttack(false);
+                    orbwalker.SetMovement(false);
+                }
+                else
+                {
+                    orbwalker.SetAttack(true);
+                    orbwalker.SetMovement(true);
+                }
             }
         }
         private static InventorySlot GetBestWardSlot()
         {
-            InventorySlot slot = Items.GetWardSlot();
-            if (slot == default(InventorySlot)) return null;
+            var slot = Items.GetWardSlot();
+            if (slot == default(InventorySlot))
+            {
+                return null;
+            }
             return slot;
+
         }
         static void WardJump()
         {
@@ -143,7 +158,17 @@ namespace sAIO.Champions
         }
         static void Drawing_OnDraw(EventArgs args)
         {
-            throw new NotImplementedException();
+            if (GetValueMenuBool("Draw.Q"))
+                Drawing.DrawCircle(player.Position, Q.Range, Color.Blue);
+
+            if (GetValueMenuBool("Draw.W"))
+                Drawing.DrawCircle(player.Position, Q.Range, Color.YellowGreen);
+
+            if (GetValueMenuBool("Draw.E"))
+                Drawing.DrawCircle(player.Position, E.Range, Color.Green);
+
+            if (GetValueMenuBool("Draw.R"))
+                Drawing.DrawCircle(player.Position, R.Range, Color.Red);
         }
 
         static void GameObject_OnCreate(GameObject sender, EventArgs args)
@@ -166,6 +191,7 @@ namespace sAIO.Champions
             {
                 orbwalker.SetAttack(false);
                 orbwalker.SetMovement(false);
+                return;
             }
             else
             {
@@ -211,14 +237,14 @@ namespace sAIO.Champions
                             if (Environment.TickCount - lastE > eDelay)
                             {
                                 E.CastOnUnit(target);
-                                lastE = Environment.TickCount;
+                                
                             }
                         }
 
                         if (W.IsReady() && W.IsInRange(target) && GetValueMenuBool("Combo.W"))
                             W.Cast();
-                           
-                        if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R"))
+
+                        if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R") && !W.IsReady() && !E.IsReady())
                         {
                             orbwalker.SetAttack(false);
                             orbwalker.SetMovement(false);
@@ -234,7 +260,7 @@ namespace sAIO.Champions
                             if (Environment.TickCount - lastE > eDelay)
                             {
                                 E.CastOnUnit(target);
-                                lastE = Environment.TickCount;
+                               
                             }
                         }
 
@@ -244,7 +270,7 @@ namespace sAIO.Champions
                         if (W.IsReady() && W.IsInRange(target) && GetValueMenuBool("Combo.W") && target.HasBuff("katarinaqmark"))
                             W.Cast();
 
-                        if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R"))
+                        if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R") && !W.IsReady() && !E.IsReady())
                         {
                             orbwalker.SetAttack(false);
                             orbwalker.SetMovement(false);
@@ -275,7 +301,7 @@ namespace sAIO.Champions
                             if (Environment.TickCount - lastE > eDelay)
                             {
                                 E.CastOnUnit(target);
-                                lastE = Environment.TickCount;
+                               
                             }
                         }
 
@@ -291,7 +317,7 @@ namespace sAIO.Champions
                             if (Environment.TickCount - lastE > eDelay)
                             {
                                 E.CastOnUnit(target);
-                                lastE = Environment.TickCount;
+                                
                             }
                         }
 

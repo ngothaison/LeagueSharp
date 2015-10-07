@@ -5,14 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SPrediction;
+
 using SharpDX;
 using sAIO.Core;
+
+using Color = System.Drawing.Color;
 
 namespace sAIO.Champions
 {
     class Leona : Helper
     {
+        static int lastE = 0;
         public Leona()
         {
             Leona_OnGameLoad();
@@ -31,7 +34,7 @@ namespace sAIO.Champions
             CreateMenuBool("Combo", "Combo.W", "Use W", true);
             CreateMenuBool("Combo", "Combo.E", "Use E", true);
             CreateMenuBool("Combo", "Combo.R", "Use R", true);
-          
+            CreateMenuSlider("Combo", "Combo.RDelay", "R Delay", 0, 2000, 3000);
 
             menu.AddSubMenu(new Menu("Harass", "Harass"));
             CreateMenuBool("Harass", "Harass.Q", "Use Q", true);
@@ -58,34 +61,121 @@ namespace sAIO.Champions
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
+            Obj_AI_Hero.OnProcessSpellCast += Obj_AI_Hero_OnProcessSpellCast;
+        }
+
+        static void Obj_AI_Hero_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (sender.IsMe)
+            {
+                if (args.SData.Name == E.Instance.SData.Name)
+                    lastE = Environment.TickCount;
+            }
         }
 
         static void Drawing_OnDraw(EventArgs args)
         {
-            throw new NotImplementedException();
+            if (GetValueMenuBool("Draw.Q"))
+                Drawing.DrawCircle(player.Position, Q.Range, Color.Blue);
+
+            if (GetValueMenuBool("Draw.E"))
+                Drawing.DrawCircle(player.Position, E.Range, Color.Green);
+
+            if (GetValueMenuBool("Draw.R"))
+                Drawing.DrawCircle(player.Position, R.Range, Color.Red);
         }
 
         static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            throw new NotImplementedException();
+            if (gapcloser.Sender.IsAlly)
+            {
+                return;
+            }
+
+            if (W.IsReady() && gapcloser.Sender.IsValidTarget(Q.Range))
+            {
+                Q.Cast();
+                player.IssueOrder(GameObjectOrder.AttackUnit, gapcloser.Sender);
+            }
         }
 
         static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
         {
-            throw new NotImplementedException();
+            if (E.IsInRange(sender) && GetValueMenuBool("Interrupter.E") && E.IsReady())
+            {
+                E.Cast(sender);
+            }
+
+            if (Q.IsInRange(sender) && GetValueMenuBool("Interrupter.Q") && Q.IsReady())
+            {
+                Q.Cast();   
+                player.IssueOrder(GameObjectOrder.AttackUnit, sender);
+            }
         }
 
         static void Game_OnUpdate(EventArgs args)
         {
-            throw new NotImplementedException();
+            switch (orbwalker.ActiveMode)
+            {
+                case Orbwalking.OrbwalkingMode.Combo: Combo();
+                    break;
+                case Orbwalking.OrbwalkingMode.Mixed: Harass();
+                    break;
+            }
+
         }
         static void Combo()
         {
+            var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
 
+            if(target == null || !target.IsValidTarget())
+                return;
+
+            if (Q.IsReady() && GetValueMenuBool("Combo.Q"))
+                Q.Cast();
+
+            if(E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Combo.E"))
+            {
+                var eHitChance = E.GetPrediction(target);
+
+                if (eHitChance.Hitchance == HitChance.High)
+                {
+                    E.Cast(target);                    
+                }
+                   
+                player.IssueOrder(GameObjectOrder.AttackUnit, target);
+            }
+
+            if (W.IsReady() && GetValueMenuBool("Combo.W"))
+                W.Cast();
+
+            if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R") && Environment.TickCount - lastE >= GetValueMenuSlider("Combo.RDelay"))
+                R.Cast(target);
         }
         static void Harass()
         {
+            var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
 
+            if (target == null || !target.IsValidTarget())
+                return;
+
+            if (Q.IsReady() && GetValueMenuBool("Harass.Q"))
+                Q.Cast();
+
+            if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Harass.E"))
+            {
+                var eHitChance = E.GetPrediction(target);
+
+                if (eHitChance.Hitchance == HitChance.High)
+                {
+                    E.Cast(target);
+                }
+
+                player.IssueOrder(GameObjectOrder.AttackUnit, target);
+            }
+
+            if (W.IsReady() && GetValueMenuBool("Harass.W"))
+                W.Cast();
         }
     }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
-using SPrediction;
+
 using sAIO.Core;
 
 using Color = System.Drawing.Color;
@@ -30,7 +30,7 @@ namespace sAIO.Champions
             W.SetSkillshot(0.5f, 90f, 2500, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.3f, (float)(80 * Math.PI / 180), float.MaxValue, false, SkillshotType.SkillshotCone);
 
-            SPrediction.Prediction.Initialize(menu);
+            
             menu.AddSubMenu(new Menu("Combo", "Combo"));
             CreateMenuBool("Combo", "Combo.Q", "Use Q", true);
             CreateMenuBool("Combo", "Combo.W", "Use W", true);
@@ -161,12 +161,22 @@ namespace sAIO.Champions
             {
                 if(Q.IsReady() && Q.IsInRange(target) && GetValueMenuBool("Combo.Q"))
                 {
-                    Q.SPredictionCast(target, HitChance.High);
+                    
+                        var qHitChance = Q.GetPrediction(target);
+
+                        if (qHitChance.Hitchance >= HitChance.High)
+                            Q.Cast(target);
+                    
                     
                 }
 
-                if (W.IsReady() && W.IsInRange(target) && GetValueMenuBool("Combo.W") && Environment.TickCount - lastQ > (Q.Delay * 1000))
-                    W.SPredictionCast(target, HitChance.High);
+                if (W.IsReady() && W.IsInRange(target) && GetValueMenuBool("Combo.W") && Environment.TickCount - lastQ > (Q.Delay * 1000))//Humanzier
+                {
+                    var wHitChance = W.GetPrediction(target);
+
+                    if (wHitChance.Hitchance >= HitChance.High)
+                        W.Cast(target);
+                }
 
                 if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Combo.E"))
                 {
@@ -199,12 +209,20 @@ namespace sAIO.Champions
             {
                 if (Q.IsReady() && Q.IsInRange(target) && GetValueMenuBool("Harass.Q"))
                 {
-                    Q.SPredictionCast(target, HitChance.High);
+                    var qHitChance = Q.GetPrediction(target);
+
+                    if (qHitChance.Hitchance >= HitChance.High)
+                        Q.Cast(target);
                    
                 }
 
                 if (W.IsReady() && W.IsInRange(target) && GetValueMenuBool("Harass.W") && Environment.TickCount - lastQ > (Q.Delay * 1000))
-                    W.SPredictionCast(target, HitChance.High);
+                {
+                    var wHitChance = W.GetPrediction(target);
+
+                    if (wHitChance.Hitchance >= HitChance.High)
+                        W.Cast(target);
+                }
 
                 if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Harass.E"))
                 {
@@ -217,11 +235,6 @@ namespace sAIO.Champions
                         }
                     }
 
-                    /*else
-                    {
-                        E.CastOnUnit(target);
-                        lastE = Environment.TickCount;
-                    }*/
                 }
             }
         }
@@ -302,10 +315,21 @@ namespace sAIO.Champions
                 var eDamage = E.GetDamage(enemy) * 0.9;
 
                 if (GetValueMenuBool("KS.Q") && Q.IsReady() && Q.IsInRange(enemy) && enemy.Health < qDamage)
-                    Q.SPredictionCast(enemy, HitChance.High);
+                {
+                    var qHitChance = Q.GetPrediction(enemy);
+
+                    if (qHitChance.Hitchance >= HitChance.High)
+                        Q.Cast(enemy);
+                    
+                }
 
                 if (GetValueMenuBool("KS.W") && W.IsReady() && W.IsInRange(enemy) && enemy.Health < wDamage)
-                    W.SPredictionCast(enemy, HitChance.High);
+                {
+                    var wHitChance = W.GetPrediction(enemy);
+
+                    if (wHitChance.Hitchance >= HitChance.High)
+                        W.Cast(enemy);
+                }
 
                 if (GetValueMenuBool("KS.E") && E.IsReady() && E.IsInRange(enemy) && enemy.Health < eDamage)
                     E.CastOnUnit(enemy);
