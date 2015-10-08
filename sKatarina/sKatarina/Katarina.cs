@@ -110,10 +110,9 @@ namespace sKatarina
             if(sender.IsMe)
             {
                 if (args.SData.Name == E.Instance.SData.Name)
-                    lastE = Environment.TickCount;
+                    lastE = Utils.TickCount;
 
-                if (args.SData.Name == Q.Instance.SData.Name)
-                    lastQ = Environment.TickCount;
+
 
                 if (player.IsChannelingImportantSpell() || player.HasBuff("KatarinaR") || player.HasBuff("katarinarsound",true))
                 {
@@ -238,7 +237,7 @@ namespace sKatarina
 
                         if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Combo.E") && target.HasBuff("katarinaqmark"))
                         {
-                            if (Environment.TickCount - lastE >= eDelay)
+                            if (Utils.TickCount - lastE >= eDelay)
                             {
                                 E.CastOnUnit(target);
                                 
@@ -261,7 +260,7 @@ namespace sKatarina
                     {
                         if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Combo.E"))
                         {
-                            if (Environment.TickCount - lastE >= eDelay)
+                            if (Utils.TickCount - lastE >= eDelay)
                             {
                                 E.CastOnUnit(target);
                                
@@ -302,7 +301,7 @@ namespace sKatarina
 
                         if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Harass.E") && target.HasBuff("katarinaqmark"))
                         {
-                            if (Environment.TickCount - lastE >= eDelay)
+                            if (Utils.TickCount - lastE >= eDelay)
                             {
                                 E.CastOnUnit(target);
                                
@@ -318,7 +317,7 @@ namespace sKatarina
                     {
                         if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Harass.E"))
                         {
-                            if (Environment.TickCount - lastE >= eDelay)
+                            if (Utils.TickCount - lastE >= eDelay)
                             {
                                 E.CastOnUnit(target);
                                 
