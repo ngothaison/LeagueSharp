@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace sAIO.Champions
 {
-    class Syndra
+    class Akali
     {
     }
 }

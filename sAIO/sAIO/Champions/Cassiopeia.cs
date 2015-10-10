@@ -15,7 +15,7 @@ namespace sAIO.Champions
 {
     public class Cassiopeia : Helper
     {
-        private static int lastQ, lastE;
+        private static int lastQ = 0, lastE = 0;
         public Cassiopeia()
         {
             Cassiopeia_OnGameLoad();
@@ -182,7 +182,7 @@ namespace sAIO.Champions
                 {
                     if(target.HasBuffOfType(BuffType.Poison))
                     {
-                        if (Environment.TickCount - lastE > eDelay)
+                        if (Environment.TickCount - lastE >= eDelay)
                         {
                             E.CastOnUnit(target);
                             
@@ -228,7 +228,7 @@ namespace sAIO.Champions
                 {
                     if (target.HasBuffOfType(BuffType.Poison))
                     {
-                        if (Environment.TickCount - lastE > eDelay)
+                        if (Environment.TickCount - lastE >= eDelay)
                         {
                             E.CastOnUnit(target);
                             

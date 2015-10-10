@@ -159,9 +159,12 @@ namespace sAIO.Champions
                 if (args.SData.Name == E.Instance.SData.Name)
                     didE = true;
 
-                if (args.SData.Name==W.Instance.SData.Name)
+                if (args.SData.Name == Q.Instance.SData.Name || args.SData.Name == W.Instance.SData.Name || args.SData.Name == R.Instance.SData.Name)
+                    didE = false;
+
+                if (args.SData.Name == W.Instance.SData.Name)
                 {
-                    Utility.DelayAction.Add(260, Orbwalking.ResetAutoAttackTimer);
+                    Orbwalking.ResetAutoAttackTimer();
                 }
             }
         }
@@ -185,7 +188,7 @@ namespace sAIO.Champions
 
            
 
-            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW > 1000 && useQ)
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW >= 1300 && useQ)
             {
                 Q.Cast();
             }
@@ -206,7 +209,7 @@ namespace sAIO.Champions
                 CastE(target);
             }
 
-            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW > 1000 && useQ)
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW >= 1300 && useQ)
             {
                 Q.Cast();
             }
@@ -291,6 +294,7 @@ namespace sAIO.Champions
                 if(minion != null)
                 {
                     E.Cast(minion.Position);
+                    
                 }
                    
                 if (player.HasBuff("renektonsliceanddicedelay"))

@@ -28,6 +28,7 @@ namespace sAIO.Champions
             E = new Spell(SpellSlot.E, 700f);
             R = new Spell(SpellSlot.R, 550f);
 
+
             menu.AddSubMenu(new Menu("Combo", "Combo"));
             menu.SubMenu("Combo").AddItem(new MenuItem("Combo.Mode", "Mode").SetValue(new StringList(new[] { "Q+E+W+R", "E+Q+W+R" })));
             CreateMenuBool("Combo", "Combo.Q", "Use Q", true);
@@ -96,7 +97,7 @@ namespace sAIO.Champions
             GameObject.OnCreate+=GameObject_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Hero.OnProcessSpellCast += Obj_AI_Hero_OnProcessSpellCast;
-
+            new AssassinManager();
             Game.PrintChat("sAIO: " + player.ChampionName + " loaded");
 
         }

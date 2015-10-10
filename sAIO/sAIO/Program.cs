@@ -14,7 +14,7 @@ namespace sAIO
     {
         public static Obj_AI_Hero player { get { return ObjectManager.Player; } }
         public static Orbwalking.Orbwalker orbwalker;
-        public static Spell Q, Q2, W, E, E2, R;
+        public static Spell Q, Q2, W, W2, E, E2, R;
         public static Items.Item Tiamat, Hydra;
         public static Menu menu;
         public static SpellSlot Ignite;
@@ -53,6 +53,18 @@ namespace sAIO
 
                 case "Nasus":
                     new Nasus();
+                    break;
+
+                case "Darius":
+                    new Darius();
+                    break;
+
+                case "Leona":
+                    new Leona();
+                    break;
+
+                case "Talon":
+                    new Talon();
                     break;
             }
 

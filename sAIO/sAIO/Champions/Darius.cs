@@ -86,7 +86,7 @@ namespace sAIO.Champions
                 DrawDamage.Fill = eventArgs.GetNewValue<Circle>().Active;
                 DrawDamage.FillColor = eventArgs.GetNewValue<Circle>().Color;
             };
-
+            menu.AddToMainMenu();
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
@@ -99,7 +99,11 @@ namespace sAIO.Champions
             if(sender.IsMe)
             {
                 if (args.SData.Name == R.Instance.SData.Name)
+                {
                     didW = true;
+                    Orbwalking.ResetAutoAttackTimer();
+                }
+                    
             }
         }
 
