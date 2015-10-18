@@ -114,18 +114,22 @@ namespace sAIO.Champions
 
         static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.Combo || orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.Mixed)
+            if (!unit.IsMe)
                 return;
 
-            if (Q.IsReady() && (GetValueMenuBool("Combo.Q") || GetValueMenuBool("Harass.Q")))
-                Q.Cast();
+            if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+            {
+                if (Q.IsReady() && (GetValueMenuBool("Combo.Q") || GetValueMenuBool("Harass.Q")))
+                    Q.Cast(player);
 
-            if (Tiamat.IsOwned() && Tiamat.IsReady() && Utils.TickCount - lastQ >= 2000)
-                Tiamat.Cast();
+                if (Tiamat.IsOwned() && Tiamat.IsReady() && Utils.TickCount - lastQ >= 2000)
+                    Tiamat.Cast();
 
-            if (Hydra.IsOwned() && Hydra.IsReady() && Utils.TickCount - lastQ >= 2300)
-                Hydra.Cast();
-        }
+                if (Hydra.IsOwned() && Hydra.IsReady() && Utils.TickCount - lastQ >= 2300)
+                    Hydra.Cast();        
+            }
+
+        }  
 
         static void Game_OnUpdate(EventArgs args)
         {
@@ -163,7 +167,7 @@ namespace sAIO.Champions
             if (target == null) return;
 
             if (R.IsReady() && GetValueMenuBool("Combo.R"))
-                R.Cast();
+                R.CastOnUnit(player);
 
             if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Combo.E"))
                 E.CastOnUnit(target);

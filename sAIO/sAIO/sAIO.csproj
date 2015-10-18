@@ -58,16 +58,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="clipper_library">
-      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\clipper_library.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\clipper_library.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp">
-      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\LeagueSharp.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\LeagueSharp.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.Common">
-      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\LeagueSharp.Common.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>E:\Users\Sơn\Downloads\leaguesharp\System\SharpDX.dll</HintPath>
+      <HintPath>E:\Users\Sơn\Downloads\LeagueSharp\System\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -147,7 +147,7 @@ namespace sAIO.Champions
             }
 
             if (W.IsReady() && GetValueMenuBool("Combo.W"))
-                W.Cast();
+                W.Cast(player);
 
             if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R") && Environment.TickCount - lastE >= GetValueMenuSlider("Combo.RDelay"))
                 R.Cast(target);
@@ -175,7 +175,7 @@ namespace sAIO.Champions
             }
 
             if (W.IsReady() && GetValueMenuBool("Harass.W"))
-                W.Cast();
+                W.Cast(player);
         }
     }
 
