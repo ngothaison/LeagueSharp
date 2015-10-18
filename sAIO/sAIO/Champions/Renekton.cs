@@ -42,12 +42,15 @@ namespace sAIO.Champions
             CreateMenuBool("sRenekton.Combo", "Combo.W", "Use W", true);
             CreateMenuBool("sRenekton.Combo", "Combo.E", "Use E", true);
             CreateMenuBool("sRenekton.Combo", "Combo.R", "Use R", true);
+            CreateMenuBool("sRenekton.Combo", "Combo.E2", "E2 to nearest turret", true);
 
             Menu harassMenu = new Menu("Harass", "sRenekton.Harass");
             menu.AddSubMenu(harassMenu);
             CreateMenuBool("sRenekton.Harass", "Harass.Q", "Use Q", true);
             CreateMenuBool("sRenekton.Harass", "Harass.W", "Use W", true);
             CreateMenuBool("sRenekton.Harass", "Harass.E", "Use E", true);
+            CreateMenuBool("sRenekton.Harass", "Harass.E2", "E2 to nearest turret", true);
+
 
             Menu gapMenu = new Menu("Gap Closer", "sRenekton.GapCloser");
             menu.AddSubMenu(gapMenu);
@@ -188,7 +191,7 @@ namespace sAIO.Champions
 
            
 
-            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW >= 1300 && useQ)
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW >= 1400 && useQ)
             {
                 Q.Cast();
             }
@@ -281,10 +284,18 @@ namespace sAIO.Champions
         {
             
 
-            if (player.Distance(target.Position) <= E.Range && target != null && !didE)
+            if (player.Distance(target.Position) <= E.Range && target != null)
             {
-                E.Cast(target.Position);
+                if(!didE)
+                    E.Cast(target.Position);
                 
+                if (GetValueMenuBool("Combo.E2") || GetValueMenuBool("Harass.E2"))
+                {
+                    var nearestTurret = ObjectManager.Get<Obj_AI_Turret>().Where(t => t.Team == player.Team && !t.IsDead && t.Distance(player.Position) < 2000).FirstOrDefault();
+
+                    if (E.IsReady() && player.HasBuff("renektonsliceanddicedelay") && nearestTurret != null && didE)
+                        E.Cast(nearestTurret.Position);
+                }
             }              
 
             else

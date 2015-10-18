@@ -25,6 +25,8 @@ namespace sAIO
 
         static void Game_OnGameLoad(EventArgs args)
         {
+            //string[] supportedChampions={"Blitzcank","Cassiopeia","Darius","Katarina",""}
+
             menu = new Menu("sAIO: " + player.ChampionName, player.ChampionName, true);
             Menu OrbwalkerMenu = new Menu("Orbwalker", "Orbwalker");
             orbwalker = new Orbwalking.Orbwalker(OrbwalkerMenu);
@@ -65,6 +67,10 @@ namespace sAIO
 
                 case "Talon":
                     new Talon();
+                    break;
+
+                case "Blitzcrank":
+                    new Blitzcrank();
                     break;
             }
 
