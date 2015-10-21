@@ -305,7 +305,7 @@ namespace sAIO.Champions
                     var nearestTurret = ObjectManager.Get<Obj_AI_Turret>().Where(t => t.Team == player.Team && !t.IsDead && t.Distance(player.Position) < 2000).FirstOrDefault();
 
                     if (E.IsReady() && player.HasBuff("renektonsliceanddicedelay") && nearestTurret != null && didE)
-                        E.Cast(nearestTurret.Position);
+                        E2.Cast(nearestTurret.Position);
                 }
             }              
 

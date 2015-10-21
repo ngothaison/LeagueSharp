@@ -13,7 +13,7 @@ namespace sAIO.Champions
 {
     class Talon : Helper
     {
-        private static int lastQ = 0;
+        private static int lastR = 0, lastQ = 0;
         public Talon()
         {
             Talon_OnGameLoad();
@@ -37,7 +37,7 @@ namespace sAIO.Champions
             CreateMenuBool("Combo", "Combo.W", "Use W", true);
             CreateMenuBool("Combo", "Combo.E", "Use E", true);
             CreateMenuBool("Combo", "Combo.R", "Use R", true);
-            //menu.SubMenu("Combo").AddItem(new MenuItem("Combo.EDelay", "E delay").SetValue(new Slider(0, 0, 1000)));
+            menu.SubMenu("Combo").AddItem(new MenuItem("Combo.EDelay", "E delay").SetValue(new Slider(0, 0, 4000)));
 
 
             menu.AddSubMenu(new Menu("Harass", "Harass"));
@@ -109,6 +109,7 @@ namespace sAIO.Champions
                     lastQ = Utils.TickCount;
                     Orbwalking.ResetAutoAttackTimer();
                 }
+                    //Orbwalking.ResetAutoAttackTimer();
             }
         }
 
@@ -169,7 +170,7 @@ namespace sAIO.Champions
             if (R.IsReady() && GetValueMenuBool("Combo.R"))
                 R.CastOnUnit(player);
 
-            if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Combo.E"))
+            if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Combo.E") && Utils.TickCount - lastR > GetValueMenuSlider("Combo.EDelay"))
                 E.CastOnUnit(target);
 
             if (W.IsReady() && W.IsInRange(target) && GetValueMenuBool("Combo.W"))

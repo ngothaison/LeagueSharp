@@ -150,7 +150,7 @@ namespace sAIO.Champions
                         var qHitChance = Q.GetPrediction(target);
 
                         if (qHitChance.Hitchance >= HitChance.High && qHitChance.CollisionObjects.Count < 1)
-                            Q.Cast(target);
+                            Q.Cast(qHitChance.CastPosition);
                     }
 
                     if (GetValueMenuBool("Combo.W") && W.IsReady() && W.IsInRange(target))
@@ -167,7 +167,7 @@ namespace sAIO.Champions
                         var qHitChance = Q.GetPrediction(target);
 
                         if (qHitChance.Hitchance >= HitChance.High && qHitChance.CollisionObjects.Count < 1)
-                            Q.Cast(target);
+                            Q.Cast(qHitChance.CastPosition);
                     }
 
                     if (GetValueMenuBool("Combo.R") && R.IsReady())
@@ -194,7 +194,7 @@ namespace sAIO.Champions
                     var qHitChance = Q.GetPrediction(target);
 
                     if (qHitChance.Hitchance >= HitChance.High && qHitChance.CollisionObjects.Count < 1)
-                        Q.Cast(target);
+                        Q.Cast(qHitChance.CastPosition);
                 }
 
                 if (GetValueMenuBool("Harass.W") && W.IsReady() && W.IsInRange(target))
@@ -315,7 +315,7 @@ namespace sAIO.Champions
                     var qHitChance = Q.GetPrediction(enemy);
 
                     if (qHitChance.Hitchance >= HitChance.High && qHitChance.CollisionObjects.Count < 1)
-                        Q.Cast(enemy);
+                        Q.Cast(qHitChance.CastPosition);
                 }
 
                 if (GetValueMenuBool("KS.W") && W.IsReady() && W.IsInRange(enemy) && enemy.Health < wDamage)
