@@ -67,6 +67,10 @@ namespace sAIO.Champions
             CreateMenuBool("sRenekton.Farm", "Farm.W", "Use W", true);
             CreateMenuBool("sRenekton.Farm", "Farm.E", "Use E", true);
 
+            menu.AddSubMenu(new Menu("Auto Q", "AutoQ"));
+            CreateMenuBool("AutoQ", "AutoQ.Enable", "Enable", true);
+            CreateMenuSlider("AutoQ", "AutoQ.Health", "Health Percent", 1, 20, 100);
+
             menu.AddToMainMenu();                    
                       
             
@@ -153,6 +157,8 @@ namespace sAIO.Champions
                     LaneClean();
                     break;
             }
+
+            AutoQ();
         }
 
         static void Obj_AI_Hero_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -166,6 +172,11 @@ namespace sAIO.Champions
                     didE = false;
 
                 if (args.SData.Name == W.Instance.SData.Name)
+                {
+                    Orbwalking.ResetAutoAttackTimer();
+                }
+
+                if (args.SData.Name == Q.Instance.SData.Name)
                 {
                     Orbwalking.ResetAutoAttackTimer();
                 }
@@ -191,7 +202,7 @@ namespace sAIO.Champions
 
            
 
-            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW >= 1400 && useQ)
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Environment.TickCount - lastW >= 1300 && useQ)
             {
                 Q.Cast();
             }
@@ -287,7 +298,7 @@ namespace sAIO.Champions
             if (player.Distance(target.Position) <= E.Range && target != null)
             {
                 if(!didE)
-                    E.Cast(target.Position);
+                    E.Cast(target.ServerPosition);
                 
                 if (GetValueMenuBool("Combo.E2") || GetValueMenuBool("Harass.E2"))
                 {
@@ -312,5 +323,23 @@ namespace sAIO.Champions
                     E2.Cast(target.Position);
             }
         }
+        private static void AutoQ()
+        {
+            if (!player.HasBuff("renektonrageready") || orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+                return;
+
+            var healthPercent = GetValueMenuSlider("AutoQ.Health");
+
+            if (player.HealthPercent <= healthPercent)
+            {
+                var minion = MinionManager.GetMinions(Q.Range).FirstOrDefault();
+
+                if (player.Distance(minion.Position) < Q.Range && Q.IsReady() && GetValueMenuBool("AutoQ.Enable"))
+                {
+                    Q.Cast();
+                }
+            }
+        }
+
     }
 }

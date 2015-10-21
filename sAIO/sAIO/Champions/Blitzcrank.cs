@@ -85,7 +85,7 @@ namespace sAIO.Champions
                 var qHitChance = Q.GetPrediction(sender);
 
                 if (qHitChance.Hitchance == HitChance.High && qHitChance.CollisionObjects.Count < 1)
-                    Q.Cast(sender);
+                    Q.Cast(qHitChance.CastPosition);
             }
 
             if (E.IsReady() && GetValueMenuBool("GC.E") && E.IsInRange(sender))
@@ -122,9 +122,14 @@ namespace sAIO.Champions
 
         private static void Combo()
         {
+
+
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
-            if (W.IsReady() && GetValueMenuBool("Combo.W") && !Q.IsInRange(target))
+            if (target == null)
+                return;
+
+            if (W.IsReady() && GetValueMenuBool("Combo.W") && player.Distance(target.Position) < Q.Range)
                 W.CastOnUnit(player);
 
             if(Q.IsReady() && GetValueMenuBool("Combo.Q") && Q.IsInRange(target))
@@ -132,7 +137,7 @@ namespace sAIO.Champions
                 var qPrediction = Q.GetPrediction(target);
 
                 if (qPrediction.Hitchance == HitChance.High && qPrediction.CollisionObjects.Count < 1)
-                    Q.Cast(target);
+                    Q.Cast(qPrediction.CastPosition);
             }
 
             if(E.IsReady() && GetValueMenuBool("Combo.E") && E.IsInRange(target))
@@ -153,7 +158,10 @@ namespace sAIO.Champions
 
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
-            if (W.IsReady() && GetValueMenuBool("Harass.W") && !Q.IsInRange(target))
+            if (target == null)
+                return;
+
+            if (W.IsReady() && GetValueMenuBool("Harass.W") && player.Distance(target.Position) < Q.Range)
                 W.CastOnUnit(player);
 
             if (Q.IsReady() && GetValueMenuBool("Harass.Q") && Q.IsInRange(target))
@@ -161,7 +169,7 @@ namespace sAIO.Champions
                 var qPrediction = Q.GetPrediction(target);
 
                 if (qPrediction.Hitchance == HitChance.High && qPrediction.CollisionObjects.Count < 1)
-                    Q.Cast(target);
+                    Q.Cast(qPrediction.CastPosition);
             }
 
             if (E.IsReady() && GetValueMenuBool("Harass.E") && E.IsInRange(target))
