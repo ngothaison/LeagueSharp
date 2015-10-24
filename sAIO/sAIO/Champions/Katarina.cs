@@ -50,9 +50,9 @@ namespace sAIO.Champions
             CreateMenuBool("GC", "GC.W", "Use W", true);
 
             menu.AddSubMenu(new Menu("Kill Steal", "KS"));
-            CreateMenuBool("KC", "KS.Q", "Use Q", true);
-            CreateMenuBool("KC", "KS.W", "Use E", true);
-            CreateMenuBool("KC", "KS.E", "Use E", false);
+            CreateMenuBool("KS", "KS.Q", "Use Q", true);
+            CreateMenuBool("KS", "KS.W", "Use E", true);
+            CreateMenuBool("KS", "KS.E", "Use E", false);
 
             menu.AddSubMenu(new Menu("Farm", "Farm"));
             CreateMenuBool("Farm", "Farm.Q", "Use Q", true);

@@ -104,7 +104,13 @@ namespace sAIO.Champions
         {
             if(sender.IsMe)
             {
-                if(args.SData.Name == Q.Instance.SData.Name)
+                if(args.SData.Name == R.Instance.SData.Name)
+                {
+                    lastR = Utils.TickCount;
+                    //Orbwalking.ResetAutoAttackTimer();
+                }
+
+                if (args.SData.Name == Q.Instance.SData.Name)
                 {
                     lastQ = Utils.TickCount;
                     Orbwalking.ResetAutoAttackTimer();

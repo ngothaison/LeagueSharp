@@ -14,7 +14,7 @@ namespace sAIO.Champions
 {
     class Darius : Helper
     {
-        static bool didW = false;
+        
          public Darius()
         {
             Darius_OnGameLoad();
@@ -26,6 +26,8 @@ namespace sAIO.Champions
             E = new Spell(SpellSlot.E, 540f);
             R = new Spell(SpellSlot.R, 460f);
             E.SetSkillshot(0.3f, 80, int.MaxValue, false, SkillshotType.SkillshotCone);
+            Q.SetSkillshot(0.75f, 42.5f, int.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetTargetted(1.25f, int.MaxValue);
 
             menu.AddSubMenu(new Menu("Combo", "Combo"));
             CreateMenuBool("Combo", "Combo.Q", "Use Q", true);
@@ -50,8 +52,8 @@ namespace sAIO.Champions
             
 
             menu.AddSubMenu(new Menu("Kill Steal", "KS"));
-            CreateMenuBool("KC", "KS.Q", "Use Q", true);
-            CreateMenuBool("KC", "KS.R", "Use R", false);
+            CreateMenuBool("KS", "KS.Q", "Use Q", true);
+            CreateMenuBool("KS", "KS.R", "Use R", false);
 
             menu.AddSubMenu(new Menu("Farm", "Farm"));
             CreateMenuBool("Farm", "Farm.Q", "Use Q", true);
@@ -100,7 +102,7 @@ namespace sAIO.Champions
             {
                 if (args.SData.Name == R.Instance.SData.Name)
                 {
-                    didW = true;
+                    
                     Orbwalking.ResetAutoAttackTimer();
                 }
                     
@@ -117,10 +119,14 @@ namespace sAIO.Champions
 
         static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (W.IsReady() && (GetValueMenuBool("Combo.W") || GetValueMenuBool("Harass.W")) && W.IsInRange(target))
-                W.Cast();
+            if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+            {
+                if (W.IsReady() && (GetValueMenuBool("Combo.W") || GetValueMenuBool("Harass.W")) && W.IsInRange(target))
+                    W.Cast();
 
-            UseItems((Obj_AI_Hero)target);
+                UseItems((Obj_AI_Hero)target);
+            }
+            
         }
 
         static void Drawing_OnDraw(EventArgs args)
@@ -162,22 +168,36 @@ namespace sAIO.Champions
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
+            if (target == null)
+                return;
+
             if (E.IsInRange(target) && E.IsReady() && GetValueMenuBool("Combo.E"))
                 E.Cast(target);
 
             if (Q.IsInRange(target) && Q.IsReady() && GetValueMenuBool("Combo.Q"))
                 Q.Cast();
 
-            if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R") && didW)// prevent cast R before W
+            if (R.IsReady() && R.IsInRange(target) && GetValueMenuBool("Combo.R"))
             {
-                if (GetValueMenuBool("Combo.RK"))
+                foreach (var hero in
+                                  ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(R.Range)))
                 {
-                    if (target.Health < (R.GetDamage(target) * 0.9))
+                    if (!GetValueMenuBool("Combo.RK"))
+                    {
                         R.CastOnUnit(target);
-                }
+                    }
 
-                else
-                    R.CastOnUnit(target);
+                    else if (player.GetSpellDamage(target, SpellSlot.R) < hero.Health && GetValueMenuBool("Combo.RK"))
+                    {
+                        foreach (var buff in hero.Buffs.Where(buff => buff.Name == "dariushemo"))
+                        {
+                            if (player.GetSpellDamage(target, SpellSlot.R, 1) * (1 + buff.Count / 5) - 1 > target.Health)
+                            {
+                                R.CastOnUnit(target);
+                            }
+                        }
+                    }
+                }
             }
         }
         static void Harass()
@@ -186,6 +206,9 @@ namespace sAIO.Champions
                 return;
 
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+
+            if (target == null)
+                return;
 
             if (E.IsInRange(target) && E.IsReady() && GetValueMenuBool("Combo.E"))
                 E.Cast(target);

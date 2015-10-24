@@ -72,6 +72,10 @@ namespace sAIO
                 case "Blitzcrank":
                     new Blitzcrank();
                     break;
+
+                case "Akali":
+                    new Akali();
+                    break;
             }
 
         }

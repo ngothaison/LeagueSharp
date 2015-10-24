@@ -89,7 +89,6 @@
     <Compile Include="Champions\Ryze.cs" />
     <Compile Include="Champions\Akali.cs" />
     <Compile Include="Champions\Talon.cs" />
-    <Compile Include="Champions\Xerath.cs" />
     <Compile Include="Core\AssassinManager.cs" />
     <Compile Include="Core\DrawDamage.cs" />
     <Compile Include="Core\Helper.cs" />

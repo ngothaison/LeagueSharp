@@ -14,7 +14,7 @@ namespace sAIO.Champions
 {
     class Blitzcrank : Helper
     {
-        private static int lastE;
+       
       
         public Blitzcrank()
         {

@@ -11,6 +11,10 @@ namespace sAIO.Core
 {
     public class Helper : Program
     {
+        public bool UseQCombo
+        {
+            get { return GetValueMenuBool("Combo.Q"); }
+        }
         public static void CreateMenuBool(string subMenuName, string name, string displayName, bool enable)
         {               
             menu.SubMenu(subMenuName).AddItem(new MenuItem(name, displayName).SetValue(enable));
@@ -34,6 +38,13 @@ namespace sAIO.Core
         public static bool GetValueMenuKeyBind(string itemName)
         {
             return menu.Item(itemName).GetValue<KeyBind>().Active;
+        }
+
+        public static bool HasBuff(Obj_AI_Base target, string buffName)
+        {
+            foreach (BuffInstance buff in target.Buffs)
+                if (buff.Name == buffName) return true;
+            return false;
         }
     }
 }

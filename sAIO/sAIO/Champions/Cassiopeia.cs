@@ -49,9 +49,9 @@ namespace sAIO.Champions
             CreateMenuBool("GC", "GC.W", "Use W", true);
 
             menu.AddSubMenu(new Menu("Kill Steal", "KS"));
-            CreateMenuBool("KC", "KS.Q", "Use Q", true);
-            CreateMenuBool("KC", "KS.W", "Use E", true);
-            CreateMenuBool("KC", "KS.E", "Use E", true);
+            CreateMenuBool("KS", "KS.Q", "Use Q", true);
+            CreateMenuBool("KS", "KS.W", "Use E", true);
+            CreateMenuBool("KS", "KS.E", "Use E", true);
 
             menu.AddSubMenu(new Menu("Farm", "Farm"));
             CreateMenuBool("Farm", "Farm.Q", "Use Q", true);
@@ -132,7 +132,7 @@ namespace sAIO.Champions
             if (GetValueMenuBool("GC.W"))
             {
                 if (W.IsReady() && W.IsInRange(gapcloser.Sender))
-                    W.CastOnUnit(gapcloser.Sender);
+                    W.Cast(gapcloser.Sender);
             }
         }
 
@@ -165,7 +165,7 @@ namespace sAIO.Champions
                         var qHitChance = Q.GetPrediction(target);
 
                         if (qHitChance.Hitchance >= HitChance.High)
-                            Q.Cast(target);
+                            Q.Cast(qHitChance.CastPosition);
                     
                     
                 }
@@ -175,7 +175,7 @@ namespace sAIO.Champions
                     var wHitChance = W.GetPrediction(target);
 
                     if (wHitChance.Hitchance >= HitChance.High)
-                        W.Cast(target);
+                        W.Cast(wHitChance.CastPosition);
                 }
 
                 if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Combo.E"))
@@ -212,7 +212,7 @@ namespace sAIO.Champions
                     var qHitChance = Q.GetPrediction(target);
 
                     if (qHitChance.Hitchance >= HitChance.High)
-                        Q.Cast(target);
+                        Q.Cast(qHitChance.CastPosition);
                    
                 }
 
@@ -221,7 +221,7 @@ namespace sAIO.Champions
                     var wHitChance = W.GetPrediction(target);
 
                     if (wHitChance.Hitchance >= HitChance.High)
-                        W.Cast(target);
+                        W.Cast(wHitChance.CastPosition);
                 }
 
                 if (E.IsReady() && E.IsInRange(target) && GetValueMenuBool("Harass.E"))
@@ -319,7 +319,7 @@ namespace sAIO.Champions
                     var qHitChance = Q.GetPrediction(enemy);
 
                     if (qHitChance.Hitchance >= HitChance.High)
-                        Q.Cast(enemy);
+                        Q.Cast(qHitChance.CastPosition);
                     
                 }
 
@@ -328,7 +328,7 @@ namespace sAIO.Champions
                     var wHitChance = W.GetPrediction(enemy);
 
                     if (wHitChance.Hitchance >= HitChance.High)
-                        W.Cast(enemy);
+                        W.Cast(wHitChance.CastPosition);
                 }
 
                 if (GetValueMenuBool("KS.E") && E.IsReady() && E.IsInRange(enemy) && enemy.Health < eDamage)
